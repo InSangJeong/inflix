@@ -19,11 +19,19 @@ repositories {
 }
 
 dependencies {
+	//add MariaDB
+	implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.4.1'
+	//add web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//add lombok
 	compileOnly 'org.projectlombok:lombok'
+	//add jpa
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//add mariadb
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 }
 
 test {
