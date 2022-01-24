@@ -2,21 +2,18 @@ package kr.co.insang.login.entity;
 
 import javax.persistence.*;
 
-import lombok.Getter;
-import lombok.Setter;
+import kr.co.insang.login.dto.UserDTO;
+import lombok.*;
 
 @Entity
 @Table(name = "User")
+@NoArgsConstructor
 @Getter
-@Setter
 public class User {// implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long entityid;
-
     @Column(nullable = false)
-    private String id;
+    private String user_id;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
@@ -25,5 +22,24 @@ public class User {// implements Serializable {
     private String email;
     @Column(nullable = false)
     private String signupday;
+
+    @Builder
+    public User(String user_id, String password, String nickname, String email, String signupday) {
+        this.user_id = user_id;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.signupday =signupday;
+    }
+
+    public UserDTO toDTO(){
+        return UserDTO.builder()
+                .user_id(this.user_id)
+                .password(this.password)
+                .nickname(this.nickname)
+                .email(this.email)
+                .signupday(this.signupday)
+                .build();
+    }
 
 }
