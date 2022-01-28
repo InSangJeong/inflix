@@ -15,6 +15,7 @@ public class UserDTO {
     private String nickname;
     private String email;
     private String signupday;
+    private String grade;
 
 
     public User toEntity() {
@@ -24,6 +25,7 @@ public class UserDTO {
                 .nickname(nickname)
                 .email(email)
                 .signupday(signupday)
+                .grade(grade)
                 .build();
     }
 

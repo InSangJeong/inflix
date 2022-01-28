@@ -29,20 +29,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean UpdateUser(UserDTO userdto){
-        //먼저 요청한사람과 요청내용이맞는지 중복확인 필요.
-
-        //확인되면 저장
         User user = userdto.toEntity();
         User result = userRepo.save(user);
         return result != null;
     }
 
     @Override
-    public UserDTO GetUser(String user_id) {
+    public boolean CheckID(String user_id){
+        Optional<User> user = userRepo.findById(user_id);
+        return user.isPresent();
+    }
+
+    @Override
+    public UserDTO GetUser(String user_id, String password) {
         Optional<User> user = userRepo.findById(user_id);
         if (user.isPresent()) {
-            //return userDTO.orElse(null); 형식으로 쓰고싶은데...
-            return user.get().toDTO();
+            if(user.get().toDTO().getPassword().equals(password))
+                return user.get().toDTO();
+            else
+                return null;
         }
         else
             return null;

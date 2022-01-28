@@ -22,14 +22,17 @@ public class User {// implements Serializable {
     private String email;
     @Column(nullable = false)
     private String signupday;
+    @Column(nullable = false)
+    private String grade;
 
     @Builder
-    public User(String user_id, String password, String nickname, String email, String signupday) {
+    public User(String user_id, String password, String nickname, String email, String signupday, String grade) {
         this.user_id = user_id;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
-        this.signupday =signupday;
+        this.signupday = signupday;
+        this.grade = grade;
     }
 
     public UserDTO toDTO(){
@@ -39,6 +42,7 @@ public class User {// implements Serializable {
                 .nickname(this.nickname)
                 .email(this.email)
                 .signupday(this.signupday)
+                .grade(this.grade)
                 .build();
     }
 

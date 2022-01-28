@@ -8,7 +8,8 @@ public interface UserService {
     //true == success, false == fail
     boolean CreateUser(UserDTO userdto);
     boolean UpdateUser(UserDTO userdto);
-    UserDTO GetUser(String user_id);
-
+    UserDTO GetUser(String user_id, String password);
     boolean DeleteUser(String user_id);
+
+    boolean CheckID(String user_id);
 }

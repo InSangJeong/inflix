@@ -18,33 +18,30 @@ public class UserController {
         this.userService = userService;
     }
 
-    //회원정보를 보여주는 기능
-    //없는 회원일 경우 null, 있는 회원일 경우 회원 정보를 json형태로 전달.
+    //중복계정 확인.
     @GetMapping("/user/{id}")
-    public UserDTO getUserinfo(@PathVariable("id")String id){
-            UserDTO userDTO = userService.GetUser(id);
-            return userDTO;
+    public boolean checkID(@PathVariable String id){
+            return  userService.CheckID(id);
     }
-    /*
+
+    //인증정보, 유저 정보 확인.
     @GetMapping("/user")
-    public List<UserDTO> getAllUserinfo(){
-        List<UserDTO> userDTOs = userService.GetAllUser();
-        return userDTOs;
-    }*/
+    public UserDTO getUserinfo(@RequestParam("user_id")String id, @RequestParam("password")String password){
+        UserDTO userDTO = userService.GetUser(id, password);
+        return userDTO;
+    }
 
     @PostMapping("/user")
-    public UserDTO createUser(@RequestBody UserDTO user){
-        if(userService.CreateUser(user))
-            return userService.GetUser(user.getUser_id());
-        else
-            return null;
+    //회원 가입후 가입 성공 여부 반환.
+    public boolean createUser(@RequestBody UserDTO user){
+        userService.CreateUser(user);
+        return userService.CheckID(user.getUser_id());
     }
 
-    //아래 두개 기능 추가.
     @PutMapping("/user")
     public UserDTO updateUser(@RequestBody UserDTO user){
         if(userService.UpdateUser(user))
-            return userService.GetUser(user.getUser_id());
+            return userService.GetUser(user.getUser_id(), user.getPassword());
         else
             return null;
     }
