@@ -1,6 +1,8 @@
 package kr.co.insang.autho.service;
 
 import kr.co.insang.autho.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,12 +13,14 @@ import java.nio.charset.Charset;
 
 @Service
 public class RESTService {
+    @Value("${loginserver}")
+    private String loginSeverIP;
 
     //login server에게 회원정보 요청.
     public UserDTO GetUserDTO(String user_id, String password) {
 
         URI uri = UriComponentsBuilder
-                .fromUriString("http://localhost:9000")
+                .fromUriString(loginSeverIP)
                 .path("/login-api-v1/user")
                 .queryParam("user_id", user_id)
                 .queryParam("password", password)
@@ -24,10 +28,10 @@ public class RESTService {
                 .build()
                 .toUri();
 
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate(); //TODO : 구조 바꿔야함.
         ResponseEntity<UserDTO> result = restTemplate.getForEntity(uri, UserDTO.class);
-
-        return null;//등록되지 않은 유저.
+        return result.getBody();
+        //return null;//등록되지 않은 유저.
     }
 
 }
