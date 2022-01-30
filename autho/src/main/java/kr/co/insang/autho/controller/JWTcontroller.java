@@ -1,5 +1,6 @@
 package kr.co.insang.autho.controller;
 
+import kr.co.insang.autho.constant.JwtType;
 import kr.co.insang.autho.dto.UserDTO;
 import kr.co.insang.autho.service.JWTService;
 import kr.co.insang.autho.service.RESTService;
@@ -31,11 +32,18 @@ public class JWTcontroller {
         else
         {
             //유저 정보를 토대로 Jwt 생성.
-            String jwtToken = jwtService.makeJwtToken(userDTO);
-            return jwtToken;
+            return jwtService.makeJwtToken(userDTO, JwtType.ACCESS);
+//            jwtService.makeJwtToken(userDTO, JwtType.REFRESH);
         }
-
     }
 
+    //토큰 검증 테스트용..
+    @GetMapping("/check")
+    public String CheckToken(@RequestParam("token")String token){
+
+        String result = jwtService.checkToken(token);
+
+        return "";
+    }
 
 }
