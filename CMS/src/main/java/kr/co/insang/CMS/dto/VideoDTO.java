@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Getter
 @NoArgsConstructor
@@ -26,6 +29,12 @@ public class VideoDTO {
                 .path_poster(path_source)
                 .path_source(path_source)
                 .build();
+    }
+
+    public List<Video> toListEntity(List<VideoDTO> videoDTOs){
+        return videoDTOs.stream()
+                .map(VideoDTO::toEntity)
+                .collect(Collectors.toList());
     }
 
 }
