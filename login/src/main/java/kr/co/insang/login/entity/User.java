@@ -5,6 +5,9 @@ import javax.persistence.*;
 import kr.co.insang.login.dto.UserDTO;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "User")
 @NoArgsConstructor
@@ -31,8 +34,13 @@ public class User {// implements Serializable {
         this.password = password;
         this.nickname = nickname;
         this.email = email;
-        this.signupday = signupday;
-        this.grade = grade;
+        if(signupday==null)
+            this.signupday = LocalDateTime.now().toString();
+        else
+            this.signupday = signupday;
+
+        if(grade==null)//일단 USER로 fix.
+            this.grade = "USER";
     }
 
     public UserDTO toDTO(){

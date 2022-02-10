@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/login-api-v1")
+@RequestMapping("/authen")
 public class UserController {
 
     private UserService userService;
@@ -24,10 +24,10 @@ public class UserController {
             return  userService.CheckID(id);
     }
 
-    //인증정보, 유저 정보 확인.
-    @GetMapping("/user")
-    public UserDTO getUserinfo(@RequestParam("user_id")String id, @RequestParam("password")String password){
-        UserDTO userDTO = userService.GetUser(id, password);
+    //로그인 정보 확인.
+    @PostMapping("/login")
+    public UserDTO getUserinfo(@RequestBody UserDTO user){
+        UserDTO userDTO = userService.GetUser(user.getUser_id(), user.getPassword());
         return userDTO;
     }
 
