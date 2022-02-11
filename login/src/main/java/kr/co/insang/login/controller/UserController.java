@@ -27,7 +27,7 @@ public class UserController {
     //로그인 정보 확인.
     @PostMapping("/login")
     public UserDTO getUserinfo(@RequestBody UserDTO user){
-        UserDTO userDTO = userService.GetUser(user.getUser_id(), user.getPassword());
+        UserDTO userDTO = userService.GetUser(user);
         return userDTO;
     }
 
@@ -41,7 +41,7 @@ public class UserController {
     @PutMapping("/user")
     public UserDTO updateUser(@RequestBody UserDTO user){
         if(userService.UpdateUser(user))
-            return userService.GetUser(user.getUser_id(), user.getPassword());
+            return userService.GetUser(user);
         else
             return null;
     }

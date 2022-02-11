@@ -42,11 +42,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO GetUser(String user_id, String password) {
-        Optional<User> user = userRepo.findById(user_id);
+    public UserDTO GetUser(UserDTO userdto) {
+        Optional<User> user = userRepo.findById(userdto.getUser_id());
         if (user.isPresent()) {
-            if(user.get().toDTO().getPassword().equals(password))
-                return user.get().toDTO();
+            if(user.get().toDTO().getPassword().equals(userdto.getPassword()))
+                return user.get().toLoginDTO();
             else
                 return null;
         }

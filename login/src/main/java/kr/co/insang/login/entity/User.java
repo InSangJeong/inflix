@@ -53,5 +53,15 @@ public class User {// implements Serializable {
                 .grade(this.grade)
                 .build();
     }
+    public UserDTO toLoginDTO(){
+        return UserDTO.builder()
+                .user_id(this.user_id)
+                .nickname(this.nickname)
+                .email(this.email)
+                .signupday(this.signupday)
+                .grade(this.grade)
+                .build();
+    }
+
 
 }
