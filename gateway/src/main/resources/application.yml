@@ -4,7 +4,29 @@ server:
 spring:
   cloud:
     gateway:
-      default-filters:
+      #CORS 허용 내용 추가. 내용은 https://cloud.spring.io/spring-cloud-gateway/2.1.x/multi/multi__cors_configuration.html에서 참조함.
+      #allowedOrigins : SCG를 호출하는 Web Client 주소. 만약에 로컬에서 포스트맨 등으로 테스트를 하게 될 경우에는"*"로 지정
+      #allowedHeaders : SCG에서 허용하는 해더
+      #allowedMethods : SCG에서 허용하는 메소드
+      #globalcors:
+      #  corsConfigurations:
+      #    '[/**]':
+      #      allowedOrigins: "*"
+      #      allow-credentials: true   #추가
+            #allowedHeaders:
+            #  - x-requested-with
+            #  - authorization
+            #  - content-type
+            #  - credential
+            #  - X-AUTH-TOKEN
+            #  - X-CSRF-TOKEN
+      #      allowedMethods:
+      #        - POST
+      #        - GET
+      #        - PUT
+      #        - OPTIONS
+      #        - DELETE
+      default-filters: #gateway 항목정의.
         - name: GlobalFilter
           args:
             baseMessage: Spring Cloud Gateway GlobalFilter
@@ -14,20 +36,20 @@ spring:
         - id: login
           uri: http://localhost:9000/
           predicates:
-            - Path=/login-api-v1/**
+            - Path=/authen/**
           filters:
             - name: LoginFilter
               args:
                 baseMessage: Spring Cloud Gateway LoginFilter
                 preLogger: true
                 postLogger: true
-        - id: auth
-          uri: http://localhost:9100/
+        - id: Autho
+          uri: http://localhost:8000/
           predicates:
-            - Path=/auth-jwt-v1/**
+            - Path=/autho/**
           filters:
             - name: AuthFilter
               args:
-                baseMessage: Spring Cloud Gateway AuthFilter
+                baseMessage: Spring Cloud Gateway AuthoFilter
                 preLogger: true
                 postLogger: true
