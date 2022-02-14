@@ -36,20 +36,23 @@ spring:
         - id: login
           uri: http://localhost:9000/
           predicates:
-            - Path=/authen/**
+            - Path=/authen/** #- Path=/authen/**, /login/**
           filters:
             - name: LoginFilter
               args:
                 baseMessage: Spring Cloud Gateway LoginFilter
                 preLogger: true
                 postLogger: true
-        - id: Autho
-          uri: http://localhost:8000/
-          predicates:
-            - Path=/autho/**
-          filters:
-            - name: AuthFilter
-              args:
-                baseMessage: Spring Cloud Gateway AuthoFilter
-                preLogger: true
-                postLogger: true
+
+
+
+        #- id: Autho
+        #  uri: http://localhost:8000/
+        #  predicates:
+        #   - Path=/autho/**
+        #  filters:
+        #    - name: AuthFilter
+        #      args:
+        #        baseMessage: Spring Cloud Gateway AuthoFilter
+        #        preLogger: true
+        #        postLogger: true

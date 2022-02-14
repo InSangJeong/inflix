@@ -21,7 +21,7 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
             logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
-            //홈화면, 회원가입, 아이디주복확인을 제외한 모든 요청은 Http Header에 Auth 정보가없으면 보내지않는다.
+            //홈화면, 회원가입, 아이디중복확인을 제외한 모든 요청은 Http Header에 Auth 정보가없으면 보내지않는다.
             //로직 추가 예정.
             ServerHttpRequest httpRequest = exchange.getRequest();
             HttpHeaders httpHeader = httpRequest.getHeaders();

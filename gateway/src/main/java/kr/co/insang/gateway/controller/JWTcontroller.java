@@ -3,47 +3,56 @@ package kr.co.insang.gateway.controller;
 import kr.co.insang.gateway.constant.JwtType;
 import kr.co.insang.gateway.dto.UserDTO;
 import kr.co.insang.gateway.service.JWTService;
-import kr.co.insang.gateway.service.RESTService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+*/
+
+import kr.co.insang.gateway.constant.JwtType;
+import kr.co.insang.gateway.dto.TokenDTO;
+import kr.co.insang.gateway.dto.UserDTO;
+import kr.co.insang.gateway.service.JWTService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import kr.co.insang.gateway.service.RESTService;
 
 @RestController
-@RequestMapping("/auth-jwt-v1")*/
+@RequestMapping("/autho")
 public class JWTcontroller {
-/*
-    private JWTService jwtService;
     private RESTService restService;
+    private JWTService jwtService;
 
     @Autowired
-    public JWTcontroller(JWTService jwtService, RESTService restService){
-        this.jwtService=jwtService;
-        this.restService=restService;
+    public JWTcontroller(RESTService restService, JWTService jwtService){
+        this.restService = restService;
+        this.jwtService = jwtService;
     }
 
-    @GetMapping("/token")
-    public String getToken(@RequestParam("user_id") String user_id,@RequestParam("password") String password){
 
-        //유저 있는지 인증서버에 확인
-        UserDTO userDTO = restService.GetUserDTO(user_id, password);
+    @PostMapping("/tokens")
+    public TokenDTO getTokens(@RequestBody UserDTO userDto) throws Exception {
+        UserDTO userinfo = restService.getUserDTO(userDto);
+        TokenDTO tokeninfo = new TokenDTO();
 
+        if(userinfo != null){
 
-        if(userDTO == null)
-            return "";
-        else
-        {
-            //유저 정보를 토대로 Jwt 생성.
-            return jwtService.makeJwtToken(userDTO, JwtType.ACCESS);
-//            jwtService.makeJwtToken(userDTO, JwtType.REFRESH);
+            String refreshToken = jwtService.makeRefreshToken(userinfo);
+            //"Bearer "는 Auth Value에 기본적으로 앞에 붙는데 둘다 동시에 생성할때는 안붙으니까 일단 임시로 이렇게 넣어둠...
+            String accessToken = jwtService.makeAccessToken(userinfo, "Bearer "+ refreshToken);
+
+            if(accessToken=="invalid"){
+                tokeninfo.setWarn("invalid token.");
+            }
+            else{
+                tokeninfo.setRefreshToken(refreshToken);
+                tokeninfo.setAccessToken(accessToken);
+                tokeninfo.setWarn("");
+            }
         }
+        return tokeninfo;
     }
 
-    //토큰 검증 테스트용..
-    @GetMapping("/check")
-    public String CheckToken(@RequestParam("token")String token){
-
-        String result = jwtService.checkToken(token);
-
-        return "";
-    }
-*/
 }
