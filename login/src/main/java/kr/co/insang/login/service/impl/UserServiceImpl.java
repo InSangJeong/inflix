@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO GetUser(UserDTO userdto) {
         Optional<User> user = userRepo.findById(userdto.getUser_id());
         if (user.isPresent()) {
+            //Gateway에서 온 요청은 비밀번호를 요구X
             if(user.get().toDTO().getPassword().equals(userdto.getPassword()))
                 return user.get().toLoginDTO();
             else
@@ -53,6 +54,15 @@ public class UserServiceImpl implements UserService {
         else
             return null;
     }
+    @Override
+    public UserDTO GetUser(String user_id){
+        Optional<User> user = userRepo.findById(user_id);
+        if (user.isPresent()) {
+            return user.get().toLoginDTO();
+        }
+        return null;
+    }
+
 
 
     @Override
