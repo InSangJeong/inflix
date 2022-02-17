@@ -16,7 +16,7 @@ public class User {// implements Serializable {
 
     @Id
     @Column(nullable = false)
-    private String user_id;
+    private String userid;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
@@ -29,8 +29,8 @@ public class User {// implements Serializable {
     private String grade;
 
     @Builder
-    public User(String user_id, String password, String nickname, String email, String signupday, String grade) {
-        this.user_id = user_id;
+    public User(String userid, String password, String nickname, String email, String signupday, String grade) {
+        this.userid = userid;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
@@ -45,7 +45,7 @@ public class User {// implements Serializable {
 
     public UserDTO toDTO(){
         return UserDTO.builder()
-                .user_id(this.user_id)
+                .userid(this.userid)
                 .password(this.password)
                 .nickname(this.nickname)
                 .email(this.email)
@@ -55,7 +55,7 @@ public class User {// implements Serializable {
     }
     public UserDTO toLoginDTO(){
         return UserDTO.builder()
-                .user_id(this.user_id)
+                .userid(this.userid)
                 .nickname(this.nickname)
                 .email(this.email)
                 .signupday(this.signupday)

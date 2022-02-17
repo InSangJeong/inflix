@@ -22,14 +22,14 @@ public class UserController {
 
     //중복계정 확인.
     @GetMapping("/user")
-    public boolean checkID(@RequestParam String userid){
+    public boolean checkID(@RequestParam("userid") String userid){
             return  userService.CheckID(userid);
     }
     //회원 가입후 가입 성공 여부 반환.
     @PostMapping("/user")
     public boolean createUser(@RequestBody UserDTO user){
         userService.CreateUser(user);
-        return userService.CheckID(user.getUser_id());
+        return userService.CheckID(user.getUserid());
     }
     //토큰으로 사용자 정보 얻기.(Gateway only)
     @GetMapping("/user/{userid}")

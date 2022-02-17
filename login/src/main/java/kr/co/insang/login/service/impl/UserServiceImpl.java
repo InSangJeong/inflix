@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO GetUser(UserDTO userdto) {
-        Optional<User> user = userRepo.findById(userdto.getUser_id());
+        Optional<User> user = userRepo.findById(userdto.getUserid());
         if (user.isPresent()) {
             //Gateway에서 온 요청은 비밀번호를 요구X
             if(user.get().toDTO().getPassword().equals(userdto.getPassword()))
