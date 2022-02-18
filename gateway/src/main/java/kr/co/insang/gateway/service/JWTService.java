@@ -27,35 +27,33 @@ public class JWTService {
 
     public boolean verifyToken(String token, JwtType type) throws Exception {
         String key=null;//access or refresh token key.
-        String pureToken=null;
+        //String pureToken=null;
 
 
         // 넘어올때 앞에 Bearer이 붙어서오기 때문에 이부분 확인 후 제거.
-        if(validationAuthorizationHeader(token)){
-            pureToken = extractToken(token);
-            if(type==JwtType.ACCESS)
-            {
-                key = accessKey;
-                pureToken = token;
-            }
-            else if(type==JwtType.REFRESH)
-            {
-                key = refreshKey;
-            }
-
+        //if(validationAuthorizationHeader(token)){
+        //    pureToken = extractToken(token);
+        if(type==JwtType.ACCESS)
+        {
+            key = accessKey;
+            //pureToken = token;
+        }
+        else if(type==JwtType.REFRESH)
+        {
+            key = refreshKey;
+        }
+        return checkClaim(token, key.getBytes());
 
             // 만료시간, 시그니처 확인.
-            return checkClaim(pureToken, key.getBytes());
+            //return checkClaim(pureToken, key.getBytes());
             //추가로 확인하고싶으면 아래처럼 파싱해서 확인.
             //Claims claims = Jwts.parser()
             //        .setSigningKey(key)
             //        .parseClaimsJws(pureToken)
             //        .getBody();
 
-        }
+        //}
 
-        //유효하지 않은 토큰.
-        return false;
     }
 
     public String makeAccessToken(UserDTO userDTO, String refreshToken) throws Exception {
@@ -69,7 +67,7 @@ public class JWTService {
                     .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
                     .setIssuer("insang")                            // 토큰발급자 설정
                     .setIssuedAt(now)                               //토큰 발급 시간(현재)
-                    .setAudience(userDTO.getUser_id())              //사용자 계정명
+                    .setAudience(userDTO.getUserid())              //사용자 계정명
                     .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.ACCESS.getTime()).toMillis())) //토큰 만료시간
                     .claim("grade", userDTO.getGrade())
                     .claim("type","ACCESS")
@@ -91,7 +89,7 @@ public class JWTService {
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
                 .setIssuer("insang")                            // 토큰발급자 설정
                 .setIssuedAt(now)                               //토큰 발급 시간(현재)
-                .setAudience(userDTO.getUser_id())              //사용자 계정명
+                .setAudience(userDTO.getUserid())              //사용자 계정명
                 .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.REFRESH.getTime()).toMillis())) //토큰 만료시간
                 .claim("grade", userDTO.getGrade())         //관리자 및 유저등급 나눌때 사용할 클레임.
                 .claim("type", "REFRESH")

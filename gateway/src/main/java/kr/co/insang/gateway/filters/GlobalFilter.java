@@ -8,6 +8,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -21,11 +22,10 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
             logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
-            //홈화면, 회원가입, 아이디중복확인을 제외한 모든 요청은 Http Header에 Auth 정보가없으면 보내지않는다.
-            //로직 추가 예정.
+
             ServerHttpRequest httpRequest = exchange.getRequest();
             HttpHeaders httpHeader = httpRequest.getHeaders();
-            //1. Predicate
+
 
 
             if (config.isPreLogger()) {
@@ -34,6 +34,10 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {
                     logger.info("GlobalFilter End>>>>>>" + exchange.getResponse());
+
+                    //내 프로젝트에서는 Cookies 사용하므로 ACAO를 *로 표현할수 없으니 아래처럼 헤더를 추가해서 반환.
+                    HttpHeaders headers = exchange.getResponse().getHeaders();
+                    headers.set("Access-Control-Allow-Origin", "http://localhost:8080");
                 }
             }));
         });

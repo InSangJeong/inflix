@@ -39,7 +39,7 @@ public class RESTService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         Map<String, String> map = new HashMap<>();
-        map.put("user_id", userDto.getUser_id());
+        map.put("userid", userDto.getUserid());
         map.put("password", userDto.getPassword());
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(map, headers);
 

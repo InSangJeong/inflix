@@ -1,34 +1,23 @@
 package kr.co.insang.gateway.config;
 
-import org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
 @Configuration
 @EnableWebFlux
 public class CorsGlobalConfiguration implements WebFluxConfigurer {
+    //이 CORS는 인가 서비스의 CORS이고 application.yml 파일은 Gateway의 CORS임!
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOrigins("http://localhost:8080")
                 .allowedMethods("*")
+                .allowCredentials(true)
+                .allowedHeaders("*")
                 .maxAge(3600);
     }
 
-    @Bean
-    public CorsConfiguration corsConfiguration(RoutePredicateHandlerMapping routePredicateHandlerMapping) {
-        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        Arrays.asList(HttpMethod.OPTIONS, HttpMethod.PUT, HttpMethod.GET, HttpMethod.DELETE, HttpMethod.POST) .forEach(m -> corsConfiguration.addAllowedMethod(m));
-        corsConfiguration.addAllowedOrigin("*");
-        routePredicateHandlerMapping.setCorsConfigurations(new HashMap<String, CorsConfiguration>() {{ put("/**", corsConfiguration); }});
-        return corsConfiguration;
-    }
 }
+
