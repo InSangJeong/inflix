@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum JwtType {
-    ACCESS(30,"Access"),
-    REFRESH(1440,"REFRESH"); //an hour
+    ACCESS(3600,"Access"),        //an hour
+    REFRESH(86400,"REFRESH");   //a day
 
     private final int time;
     private final String type;
@@ -13,8 +13,6 @@ public enum JwtType {
         this.time = time;
         this.type = type;
     }
-
-
 
 
 }

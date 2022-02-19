@@ -45,7 +45,7 @@ public class JWTcontroller {
             else{
 
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
-                                .httpOnly(true).path("/").domain("localhost").maxAge(60).build();
+                                .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
                         .httpOnly(true).path("/").domain("localhost").maxAge(60).build();
 

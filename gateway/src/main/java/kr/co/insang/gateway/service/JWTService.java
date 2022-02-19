@@ -5,26 +5,33 @@ import kr.co.insang.gateway.constant.JwtType;
 import kr.co.insang.gateway.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.server.DelegatingServerHttpResponse;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
+import org.springframework.util.MultiValueMap;
+import reactor.core.publisher.Flux;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 @PropertySource("classpath:application-jwt.properties")
 public class JWTService {
+    // Access, Refresh Key는 사용자마다 다르게 설정주는 것이 좋다. 보통 페이로드의 이메일등을 활용.
     @Value("${accessSecretKey}")
     private String accessKey;
     @Value("${refreshSecretKey}")
     private String refreshKey;
+
     //refresh token은 내용 볼 수 없도록 대칭키로 암호화해서 관리.
     //private AES256 aes256; (추후 구현)
     //@Autowired
     //public JWTService(AES256 aes256){this.aes256=aes256;}
 
+    //토큰 검증만 수행
     public boolean verifyToken(String token, JwtType type) throws Exception {
         String key=null;//access or refresh token key.
         //String pureToken=null;
@@ -55,6 +62,77 @@ public class JWTService {
         //}
 
     }
+
+    //토큰 검증후 맞다면 페이로드를 리턴.
+    public Claims getPayload(String token, JwtType type){
+        if(type==JwtType.ACCESS)
+            return getClaim(token, accessKey.getBytes());
+        else
+            return getClaim(token, refreshKey.getBytes());
+    }
+    //엑세스 토큰 검증 후 유효하지않으면 403(Forbidden). 리프레시토큰으로 엑세스토큰 발급은 클라이언트에게 다시 요청 받는 로직으로 수행.
+    //만약 유효한 경우면 토큰 발급자가 요청한 내용이 발급자에대한 내용인지 판단후 아니면 401(Unauthorized)
+    //둘다 맞는경우 200(Ok) 반환.
+    //ps. 원래 리프레시토큰은 필요할때만 클라이언트가 보내서 발급과정을 진행해야하는데 xss 방어를 위해서 httponly cookie를
+    //    사용하고있는 상태라 client에서 상황에 맞게 쿠키를 보내줄수가없는 상태... 매 요청마다 두 토큰이 같이 왔다갔다함.
+    //    구조가 맘에 안드는데 다른사람들은 어떻게 적용했는지 사례를 보고 바꿀 필요가 있어보임. 일단 이대로 진행.
+    public int isValuedToken(ServerHttpRequest reqeust) {
+        try {
+            String requestor = "";
+
+            //쿠키에 토큰이 있는지 확인
+            HttpCookie accessCookie = reqeust.getCookies().getFirst("accessToken");
+            if(accessCookie!=null){
+                //사용자별로 사용할수 있는 서비스를 구분하고 해당 서비스에서 할수있는 권한인지 확인해야하는데
+                //서비스 수가 많지않으니까 모든서비스에서 자기자신에게 해당하는 요청인지만 확인.
+                //토큰(페이로드의 aud)의 요청자와 요청내용이 같은 사람인지 확인한다.
+                //1. url 마지막 요청자
+                //2. json 형식의 body에 userid
+
+                Claims claims = getPayload(accessCookie.getValue(), JwtType.ACCESS);
+                if(claims!= null){
+                    requestor = claims.getAudience();    //요청자(토큰)
+                    if(requestor.equals("") || requestor==null)
+                        return 403;//aud항목이 없으므로 잘못된 토큰임.
+
+                    String requestTarget = ""; //요청 대상
+
+                    int numberOfLastPath = reqeust.getPath().elements().size() - 1;
+                    if(numberOfLastPath > 2){
+                        requestTarget = reqeust.getPath().subPath(numberOfLastPath).value();
+                    }
+
+                    /*
+                    // Json 타입의 Body에서 userid 값 받아오는 코드 삽입.
+                    //
+                     */
+
+
+
+                    if(requestor.equals(requestTarget)){//여러 방법으로 구한 요청대상자가 요청자와 일치하면
+                        return 200;
+                    }
+                    else{
+                        //요청자에게 권한이 없으므로 401 반환.
+                        return 401;
+                    }
+                }
+                else{
+                    return 403;//클레임이 없으므로 잘못된 토큰.
+                }
+            }
+            else{
+                //토큰이 없으므로 403 반환
+                return 403;
+            }
+        }catch (Exception e){
+            //혹시 모르니까 202 (Accepted)로 반환하고 원인 찾아서해결.
+            return 202;
+        }
+        //유효한 토큰이며 요청자와 요청내용이 일치.
+        //return 200;
+    }
+
 
     public String makeAccessToken(UserDTO userDTO, String refreshToken) throws Exception {
 
@@ -121,6 +199,22 @@ public class JWTService {
         }catch(JwtException e) {        //Token이 변조된 경우 Exception이 발생한다.
             //logger.error("Token Error");
             return false;
+        }
+    }
+    public Claims getClaim(String jwt, byte[] key) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(key)
+                    .parseClaimsJws(jwt)
+                    .getBody();
+            return claims;
+        }catch(ExpiredJwtException e) {   //Token이 만료된 경우 Exception이 발생한다.
+            //logger.error("Token Expired");
+            return null;
+
+        }catch(JwtException e) {        //Token이 변조된 경우 Exception이 발생한다.
+            //logger.error("Token Error");
+            return null;
         }
     }
 }
