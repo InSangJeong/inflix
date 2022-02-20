@@ -3,6 +3,7 @@ package kr.co.insang.gateway.service;
 import io.jsonwebtoken.*;
 import kr.co.insang.gateway.constant.JwtType;
 import kr.co.insang.gateway.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -26,10 +27,17 @@ public class JWTService {
     @Value("${refreshSecretKey}")
     private String refreshKey;
 
+    private RESTService restService;
     //refresh token은 내용 볼 수 없도록 대칭키로 암호화해서 관리.
     //private AES256 aes256; (추후 구현)
     //@Autowired
     //public JWTService(AES256 aes256){this.aes256=aes256;}
+
+    @Autowired
+    public JWTService(RESTService restService){
+        this.restService = restService;
+    }
+
 
     //토큰 검증만 수행
     public boolean verifyToken(String token, JwtType type) throws Exception {
@@ -134,31 +142,43 @@ public class JWTService {
     }
 
 
-    public String makeAccessToken(UserDTO userDTO, String refreshToken) throws Exception {
-
+    public String makeAccessToken(String refreshToken) throws Exception {
         if(verifyToken(refreshToken, JwtType.REFRESH))
         {
+            // 1. Refresh 토큰에서 사용자 정보 생성
+            Claims claims = getPayload(refreshToken, JwtType.REFRESH);
+            String user = claims.getAudience();
+            if(user!=null){
+                //2. 인증서버로부터 Access토큰에 넣을 값을 받아온다.
+                UserDTO userID = UserDTO.builder()
+                        .userid(user)
+                        .build();
+                UserDTO  userDTO = restService.getUser(userID);
+                //몇가지 데이터가 잘 들어왔는지만 확인.
 
-            //사용자 인증 정보 및 권한
-            Date now = new Date();
-            return Jwts.builder()
-                    .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
-                    .setIssuer("insang")                            // 토큰발급자 설정
-                    .setIssuedAt(now)                               //토큰 발급 시간(현재)
-                    .setAudience(userDTO.getUserid())              //사용자 계정명
-                    .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.ACCESS.getTime()).toMillis())) //토큰 만료시간
-                    .claim("grade", userDTO.getGrade())
-                    .claim("type","ACCESS")
-                    .claim("nickname", userDTO.getNickname())
-                    .signWith(SignatureAlgorithm.HS256, accessKey.getBytes())  // 해싱 알고리즘 + 키
-                    .compact();
+
+                if(!userDTO.getUserid().isEmpty()
+                        && !userDTO.getGrade().isEmpty()
+                        && !userDTO.getNickname().isEmpty())
+
+                {
+                    //3. Access토큰 생성 및 반환
+                    Date now = new Date();
+                    return Jwts.builder()
+                            .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
+                            .setIssuer("insang")                            // 토큰발급자 설정
+                            .setIssuedAt(now)                               //토큰 발급 시간(현재)
+                            .setAudience(userDTO.getUserid())              //사용자 계정명
+                            .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.ACCESS.getTime()).toMillis())) //토큰 만료시간
+                            .claim("grade", userDTO.getGrade())
+                            .claim("type","ACCESS")
+                            .claim("nickname", userDTO.getNickname())
+                            .signWith(SignatureAlgorithm.HS256, accessKey.getBytes())  // 해싱 알고리즘 + 키
+                            .compact();
+                }
+            }
         }
-        else
-        {
-            return "invalid";
-        }
-
-
+        return "invalid";
     }
     public String makeRefreshToken(UserDTO userDTO) throws Exception {
 

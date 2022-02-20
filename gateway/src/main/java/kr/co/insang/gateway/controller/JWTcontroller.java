@@ -29,15 +29,16 @@ public class JWTcontroller {
     }
 
     //get Access, Refresh Tokens.
+    //Refresh Token은 로그인을 통해서만 얻을 수 있으므로 아래 매핑으로만 얻어야함.
     @PostMapping("/tokens")
     public Mono<String> getTokens(@RequestBody UserDTO userDto, ServerWebExchange exchange) throws Exception {
-        UserDTO userinfo = restService.getUserDTO(userDto);
+        UserDTO userinfo = restService.getLogin(userDto);
 
         if(userinfo != null){
 
             String refreshToken = jwtService.makeRefreshToken(userinfo);
-            //"Bearer "는 Auth Value에 기본적으로 앞에 붙는데 둘다 동시에 생성할때는 안붙으니까 일단 임시로 이렇게 넣어둠...
-            String accessToken = jwtService.makeAccessToken(userinfo, refreshToken);
+
+            String accessToken = jwtService.makeAccessToken(refreshToken);
 
             if(accessToken=="invalid"){
                 return Mono.just("Fail");//return Mono.just("invalid token.");
@@ -47,7 +48,7 @@ public class JWTcontroller {
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
                                 .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                        .httpOnly(true).path("/").domain("localhost").maxAge(60).build();
+                        .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.ACCESS.getTime()).build();
 
                                 //.secure(true)
 
@@ -65,31 +66,78 @@ public class JWTcontroller {
         return Mono.just("Fail");//return Mono.just("Wrong User Info.");
     }
 
-    @GetMapping("/loginstate")
-    public Mono<String> getLoginState(ServerWebExchange exchange) throws Exception {
-
-        ServerHttpRequest request = exchange.getRequest();
-        MultiValueMap<String, HttpCookie> cookies = request.getCookies();
+    //토큰을 httponly로 관리하니 Front에서 토큰상태를 확인하기가 어려우니 아래 매핑으로 해결.
+    @GetMapping("/tokenstate")
+    public Mono<String> getTokenState(ServerWebExchange exchange) throws Exception {
+        //둘다 없거나 유효하지않으면   00
+        //엑세스토큰만 유효하면       10
+        //리프레시토큰만 유효하면     01
+        //둘다 유효하면             11
+        MultiValueMap<String, HttpCookie> cookies = exchange.getRequest().getCookies();
+        String result = "";
 
         HttpCookie accessCookie = cookies.getFirst("accessToken");
         HttpCookie refreshCookie = cookies.getFirst("refreshToken");
 
         if(accessCookie!=null){
-            if(jwtService.verifyToken(accessCookie.getValue(), JwtType.ACCESS)){
-                //유효한 Access Token인 경우.
-                return Mono.just("Ok");
-            }
-            else{
-                //Access Token이 유효하지 않으면 Refresh Token이 있는지 확인하여 발급한다.
-                if(refreshCookie!=null){
-
-                }
-            }
+            if(jwtService.verifyToken(accessCookie.getValue(), JwtType.ACCESS))
+                result += "1";
+            else
+                result += "0";
+        }else{
+            result += "0";
+        }
+        if(refreshCookie!=null){
+            if(jwtService.verifyToken(refreshCookie.getValue(), JwtType.REFRESH))
+                result += "1";
+            else
+                result += "0";
+        }else{
+            result += "0";
         }
 
-
-        ServerHttpResponse response = exchange.getResponse();
-
-        return Mono.just("Ok");
+        return Mono.just(result);
     }
+
+    //httponly에 Refresh 토큰이 있으므로 http 요청만으로 Access 토큰 생성을 시도한다.
+    //생성 성공시 Success
+    //실패시 Fail
+    @GetMapping("/accesstoken")
+    public Mono<String> getAccessToken(ServerWebExchange exchange) throws Exception{
+        MultiValueMap<String, HttpCookie> cookies = exchange.getRequest().getCookies();
+        String result = "";
+        HttpCookie refreshCookie = cookies.getFirst("refreshToken");
+
+        if(refreshCookie!=null){
+            if(jwtService.verifyToken(refreshCookie.getValue(), JwtType.REFRESH)){
+                String accessToken = jwtService.makeAccessToken(refreshCookie.getValue());
+                if(accessToken != "invalid"){//엑세스 토큰이 만들어졌으면 쿠키로 만들어서 httponly로 설정.
+                    ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
+                            .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.ACCESS.getTime()).build();
+                    exchange.getResponse().addCookie(accessCookie);
+                    result = "Success";
+                }
+            }
+            else
+                result = "Fail";
+        }else{
+            result = "Fail";
+        }
+        return Mono.just(result);
+    }
+
+    @DeleteMapping("/tokens")
+    //쿠키를 강제로 삭제할수 없으므로 만료시간을 현재로 맞춰 삭제.
+    public Mono<String> deleteTokens(ServerWebExchange exchange){
+        ResponseCookie rCookie = ResponseCookie.from("refreshToken","deleted")
+                .httpOnly(true).path("/").domain("localhost").maxAge(0).build();
+        ResponseCookie aCookie = ResponseCookie.from("accessToken","deleted")
+                .httpOnly(true).path("/").domain("localhost").maxAge(0).build();
+
+        exchange.getResponse().addCookie(rCookie);
+        exchange.getResponse().addCookie(aCookie);
+
+        return Mono.just("Success");
+    }
+
 }

@@ -21,34 +21,39 @@ public class RESTService {
     //private String loginSeverIP;
 
     //임시로 사용
-    private String loginServerIP;
+    private String gatewayServer;
+    private String pathLogin;//인증서버로 로그인요청
+    private String pathUser;//인증서버로 유저정보요청(Refresh토큰으로 Acc만들때 사용)
+    private RestTemplate restTemplate;
+    private HttpHeaders headers;
 
     @Autowired
     public RESTService(){
-         this.loginServerIP = "http://localhost:8000/authen/login";
+        this.gatewayServer = "http://localhost:8000";
 
-    }
+        this.pathLogin="/authen/login";
+        this.pathUser = "/authen/user/";
 
 
-
-    //login server에게 회원정보 요청.
-    public UserDTO getUserDTO(UserDTO userDto) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+        this.restTemplate = new RestTemplate();
+        this.headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        Map<String, String> map = new HashMap<>();
-        map.put("userid", userDto.getUserid());
-        map.put("password", userDto.getPassword());
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(map, headers);
+    }
 
-        ResponseEntity<UserDTO> response = restTemplate.postForEntity(this.loginServerIP, entity, UserDTO.class);
+    //login server에게 회원정보 요청.(POST)
+    public UserDTO getLogin(UserDTO userDto) {
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(userDto.toMap(), headers);
+        ResponseEntity<UserDTO> response = restTemplate.postForEntity(this.gatewayServer+this.pathLogin, entity, UserDTO.class);
         UserDTO result = response.getBody();
         return result;
-
-        //return result.getBody();
-        //return null;//등록되지 않은 유저.
+    }
+    //login server에게 회원정보 요청.(get)
+    public UserDTO getUser(UserDTO userDto) {
+        String baseUrl = this.gatewayServer+this.pathUser+userDto.getUserid();
+        ResponseEntity<UserDTO> response = restTemplate.getForEntity(baseUrl,  UserDTO.class);
+        UserDTO result = response.getBody();
+        return result;
     }
 
 }

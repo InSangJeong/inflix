@@ -37,17 +37,12 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
             if (config.isPreLogger()) {
                 logger.info("GlobalFilter Start>>>>>>" + exchange.getRequest());
             }
-
-
-            ServerHttpRequest httpRequest = exchange.getRequest();
-            HttpHeaders httpHeader = httpRequest.getHeaders();
-
             //application.yml에서 predicates를 이용해서 하려고했는데 더 복잡할듯해서 여기에다가함.
             //토큰이 필요한 요청인 경우 httponly(cookie) 토큰이 검증된 경우에만 pass한다.
             if(requestFilter.filterRequest(exchange.getRequest())){                 //토큰 검증 필요
                 if(jwtService.isValuedToken(exchange.getRequest()) == 200){         //유효한 토큰이며 유효한 요청.
                     //exchange.getResponse().getHeaders().add("gateway", "200");;
-                    int a = 0;
+                    ;
                 }
                 else if(jwtService.isValuedToken(exchange.getRequest()) == 403){    //유효하지 않은 토큰 403 return
                     return handleUnAuthorized(exchange,HttpStatus.FORBIDDEN); // 403 Error

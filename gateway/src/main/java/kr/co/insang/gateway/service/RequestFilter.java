@@ -15,22 +15,40 @@ public class RequestFilter {
     //true 토큰 필요, false 토큰 불필요
     //is~~ 으로 메서드명 변경해야함.
     public boolean filterRequest(ServerHttpRequest request){
-        // 22.02.18 기준 토큰 필요없는경우는
-        //1.  Get  /user   /user?userid=value
-        //2.  Post /user   /user
-        //3.  Post /login  /login
+        // 22.02.20 기준 토큰 필요없는경우는... 많아지니까 복잡해지네 리팩토링 할수있을듯한데..
+        //1.  Get       /authen/user?userid=value       //중복계정 확인용
+        //2.  Post      /authen/user                    //회원가입 결과
+        //3.  Post      /authen/login                   //로그인할때 ID,PW로 회원정보 가져오기
+        //4.  Get       /authen/user/{userid}           //Refresh 토큰으로 Access 토큰 만들때 정보가져오기
+        //5.  Post      /autho/tokens                   //로그인으로 R, A 토큰가져오기
+        //6.  Get       /autho/tokenstate               //토큰 상태확인.
+        //7.  Delete    /autho/tokens                   //토큰 삭제
 
+        boolean result = true;
         if(request.getMethod().matches("GET") ){
             if(request.getPath().toString().equals("/authen/user")){
                 if (!request.getQueryParams().isEmpty())
-                    return false;//1번.
+                    result = false;//1번.
             }
-        }
-        if(request.getMethod().matches("POST")){
+            else if(request.getPath().toString().startsWith("/authen/user/")){
+                result = false; //4번, !!! 이건 인가서비스에서만 호출할 수 있어야함. 추후 체크하는 코드 추가.
+            }
+            else if(request.getPath().toString().equals("/autho/tokens")){
+                result = false;//6번
+            }
+        }else if(request.getMethod().matches("POST")){
             if(request.getPath().toString().equals("/authen/user") ||request.getPath().toString().equals("/authen/login")){
-                return false;//2, 3번.
+                result = false;//2, 3번.
+            }
+            else if(request.getPath().toString().equals("/autho/tokens")){
+                result = false;//5번
+            }
+        }else if(request.getMethod().matches("DELETE")){
+            if(request.getPath().toString().equals("/autho/tokens")){
+                result = false;//7번
             }
         }
-        return true;//그 외 모든 요청은 토큰 필요.
+
+        return result;//그 외 모든 요청은 토큰 필요.
     }
 }
