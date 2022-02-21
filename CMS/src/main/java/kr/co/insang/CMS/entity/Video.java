@@ -9,8 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Video")
@@ -20,32 +18,36 @@ public class Video {
 
     @Id
     @Column(nullable = false)
-    private String video_id;
+    private String videoid;
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
     private String runningtime;
     @Column(nullable = false)
-    private String path_poster;
+    private String pathposter;
     @Column(nullable = false)
-    private String path_source;
+    private String pathsource;
+    @Column(nullable = false)
+    private String genre;
 
     @Builder
-    public Video(String video_id, String title, String runningtime, String path_poster, String path_source){
-        this.video_id = video_id;
+    public Video(String videoid, String title, String runningtime, String pathposter, String pathsource, String genre){
+        this.videoid = videoid;
         this.title =title;
         this.runningtime = runningtime;
-        this.path_poster = path_poster;
-        this.path_source = path_source;
+        this.pathposter = pathposter;
+        this.pathsource = pathsource;
+        this.genre = genre;
     }
 
     public VideoDTO toDTO(){
         return VideoDTO.builder()
-                .video_id(video_id)
+                .videoid(videoid)
                 .title(title)
                 .runningtime(runningtime)
-                .path_poster(path_source)
-                .path_source(path_source)
+                .pathposter(pathposter)
+                .pathsource(pathsource)
+                .genre(genre)
                 .build();
     }
 

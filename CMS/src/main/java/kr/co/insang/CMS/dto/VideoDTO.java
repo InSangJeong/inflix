@@ -15,19 +15,21 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class VideoDTO {
-    private String video_id;
+    private String videoid;
     private String title;
     private String runningtime;
-    private String path_poster;
-    private String path_source;
+    private String pathposter;
+    private String pathsource;
+    private String genre;
 
     public Video toEntity(){
         return Video.builder()
-                .video_id(video_id)
+                .videoid(videoid)
                 .title(title)
                 .runningtime(runningtime)
-                .path_poster(path_source)
-                .path_source(path_source)
+                .pathposter(pathposter)
+                .pathsource(pathsource)
+                .genre(genre)
                 .build();
     }
 

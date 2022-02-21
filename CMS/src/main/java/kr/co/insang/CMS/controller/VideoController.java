@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cms-api-v1")
+@RequestMapping("/cms")
 public class VideoController {
 
     VideoService videoService;
@@ -20,9 +20,9 @@ public class VideoController {
         this.videoService = videoService;
     }
 
-    @GetMapping("/MoviePath/{video_id}")
-    public String getPath(@PathVariable String video_id){
-        return videoService.getPath(video_id);
+    @GetMapping("/moviepath/{videoid}")
+    public String getPath(@PathVariable String videoid){
+        return videoService.getPath(videoid);
     }
     @GetMapping("/allmovies")
     public List<VideoDTO> getAllVideos(){

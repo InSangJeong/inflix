@@ -21,10 +21,10 @@ public class VideoService {
         this.videoRepository = videoRepository;
     }
 
-    public String getPath(String video_id){
-        Optional<Video> video = videoRepository.findById(video_id);
+    public String getPath(String videoid){
+        Optional<Video> video = videoRepository.findById(videoid);
         if(video.isPresent())
-            return video.get().getPath_source();
+            return video.get().getPathsource();
         else
             return "none";
     }
