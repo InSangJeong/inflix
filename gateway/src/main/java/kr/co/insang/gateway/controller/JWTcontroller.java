@@ -31,7 +31,7 @@ public class JWTcontroller {
     //get Access, Refresh Tokens.
     //Refresh Token은 로그인을 통해서만 얻을 수 있으므로 아래 매핑으로만 얻어야함.
     @PostMapping("/tokens")
-    public Mono<String> getTokens(@RequestBody UserDTO userDto, ServerWebExchange exchange) throws Exception {
+    public Mono<UserDTO> getTokens(@RequestBody UserDTO userDto, ServerWebExchange exchange) throws Exception {
         UserDTO userinfo = restService.getLogin(userDto);
 
         if(userinfo != null){
@@ -41,7 +41,7 @@ public class JWTcontroller {
             String accessToken = jwtService.makeAccessToken(refreshToken);
 
             if(accessToken=="invalid"){
-                return Mono.just("Fail");//return Mono.just("invalid token.");
+                return Mono.empty();
             }
             else{
 
@@ -49,21 +49,18 @@ public class JWTcontroller {
                                 .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
                         .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.ACCESS.getTime()).build();
-
                                 //.secure(true)
-
 
                 exchange.getResponse().addCookie(refreshCookie);
                 exchange.getResponse().addCookie(accessCookie);
 
-                //return Mono.just("Success");
-                return Mono.just(userinfo.getUserid());
+                return Mono.just(userinfo);
             }
         }
         //return ServerResponse.ok()
         //        .contentType(MediaType.APPLICATION_JSON)
         //        .body(Mono.just("Fail."), String.class);
-        return Mono.just("Fail");//return Mono.just("Wrong User Info.");
+        return Mono.empty();
     }
 
     //토큰을 httponly로 관리하니 Front에서 토큰상태를 확인하기가 어려우니 아래 매핑으로 해결.

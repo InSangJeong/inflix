@@ -45,15 +45,19 @@ public class RESTService {
     public UserDTO getLogin(UserDTO userDto) {
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(userDto.toMap(), headers);
         ResponseEntity<UserDTO> response = restTemplate.postForEntity(this.gatewayServer+this.pathLogin, entity, UserDTO.class);
-        UserDTO result = response.getBody();
-        return result;
+        if(response.hasBody())
+            return response.getBody();
+        else
+            return null;
     }
     //login server에게 회원정보 요청.(get)
     public UserDTO getUser(UserDTO userDto) {
         String baseUrl = this.gatewayServer+this.pathUser+userDto.getUserid();
         ResponseEntity<UserDTO> response = restTemplate.getForEntity(baseUrl,  UserDTO.class);
-        UserDTO result = response.getBody();
-        return result;
+        if(response.hasBody())
+            return response.getBody();
+        else
+            return null;
     }
 
 }
