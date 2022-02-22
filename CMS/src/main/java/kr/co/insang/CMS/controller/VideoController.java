@@ -1,6 +1,8 @@
 package kr.co.insang.CMS.controller;
 
 import kr.co.insang.CMS.dto.VideoDTO;
+import kr.co.insang.CMS.dto.watchHistoryDTO;
+import kr.co.insang.CMS.service.HistoryService;
 import kr.co.insang.CMS.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +31,11 @@ public class VideoController {
     String resourcePath;
 
     VideoService videoService;
+    HistoryService historyService;
     @Autowired
-    public VideoController(VideoService videoService){
+    public VideoController(VideoService videoService, HistoryService historyService){
         this.videoService = videoService;
+        this.historyService = historyService;
     }
 
     @GetMapping("/moviepath/{videoid}")
@@ -76,4 +80,10 @@ public class VideoController {
         }
     }
 
+    @GetMapping("/history/{userid}")
+    public ResponseEntity<List<watchHistoryDTO>> getWatchHistory(@PathVariable("userid") String userid){
+        List<watchHistoryDTO> result = historyService.getHistorybyUserid(userid);
+
+        return null;
+    }
 }
