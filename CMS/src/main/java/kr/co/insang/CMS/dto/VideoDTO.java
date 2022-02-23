@@ -33,7 +33,7 @@ public class VideoDTO {
                 .build();
     }
 
-    public List<Video> toListEntity(List<VideoDTO> videoDTOs){
+    static public List<Video> toListEntity(List<VideoDTO> videoDTOs){
         return videoDTOs.stream()
                 .map(VideoDTO::toEntity)
                 .collect(Collectors.toList());

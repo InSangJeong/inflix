@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "Video")
@@ -47,6 +49,10 @@ public class Video {
                 .genre(genre)
                 .build();
     }
-
+    static public List<VideoDTO> toVideoDtoList(List<Video> video){
+        return video.stream()
+                .map(Video::toDTO)
+                .collect(Collectors.toList());
+    }
 
 }

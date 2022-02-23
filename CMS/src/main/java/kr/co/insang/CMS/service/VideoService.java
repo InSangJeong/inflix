@@ -4,13 +4,13 @@ import kr.co.insang.CMS.dto.VideoDTO;
 import kr.co.insang.CMS.entity.Video;
 import kr.co.insang.CMS.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static kr.co.insang.CMS.entity.Video.toVideoDtoList;
 
 @Service
 @Transactional
@@ -33,14 +33,14 @@ public class VideoService {
 
     public List<VideoDTO> getAllVideos(){
         List<Video> videos = videoRepository.findAll();
-        return toListDTO(videos);
+        return toVideoDtoList(videos);
     }
 
-    public List<VideoDTO> toListDTO(List<Video> videos){
+/*    public List<VideoDTO> toListDTO(List<Video> videos){
         return videos.stream()
                 .map(Video::toDTO)
                 .collect(Collectors.toList());
-    }
+    }*/
 
     public String getImagePathByid(String videoid){
         Optional<Video> video = videoRepository.findById(videoid);

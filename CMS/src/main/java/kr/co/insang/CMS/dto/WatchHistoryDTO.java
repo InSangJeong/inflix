@@ -1,22 +1,24 @@
 package kr.co.insang.CMS.dto;
 
-import kr.co.insang.CMS.entity.Video;
 import kr.co.insang.CMS.entity.WatchHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class watchHistoryDTO {
+public class WatchHistoryDTO {
 
     private String historyid;
     private String userid;
     private String videoid;
-    private String watchingtate;
+    private String watchingstate;
     private String watchtime;
 
     public WatchHistory toEntity(){
@@ -24,9 +26,13 @@ public class watchHistoryDTO {
                 .historyid(historyid)
                 .userid(userid)
                 .videoid(videoid)
-                .watchingtate(watchingtate)
+                .watchingstate(watchingstate)
                 .watchtime(watchtime)
                 .build();
     }
-
+    public List<WatchHistory> toListEntity(List<WatchHistoryDTO> videoDTOs){
+        return videoDTOs.stream()
+                .map(WatchHistoryDTO::toEntity)
+                .collect(Collectors.toList());
+    }
 }

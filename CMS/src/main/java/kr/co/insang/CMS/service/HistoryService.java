@@ -1,6 +1,6 @@
 package kr.co.insang.CMS.service;
 
-import kr.co.insang.CMS.dto.watchHistoryDTO;
+import kr.co.insang.CMS.dto.WatchHistoryDTO;
 import kr.co.insang.CMS.entity.WatchHistory;
 import kr.co.insang.CMS.repository.WatchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+
+import static kr.co.insang.CMS.entity.WatchHistory.toWatchHistoyDtoList;
 
 @Service
 @Transactional
@@ -20,13 +22,14 @@ public class HistoryService {
         this.watchHistoryRepository = watchHistoryRepository;
     }
 
-    public List<watchHistoryDTO> getHistorybyUserid(String userid){
+    public List<WatchHistoryDTO> getHistorybyUserid(String userid){
         try{
-            List<WatchHistory> His = watchHistoryRepository.findAll();
-            List<WatchHistory> History = watchHistoryRepository.findAllByuserid(userid);
+            List<WatchHistory> history = watchHistoryRepository.findAllByuserid(userid);
 
-            if(!History.isEmpty())
-                return null;
+
+            if(!history.isEmpty()){
+                return toWatchHistoyDtoList(history);
+            }
             else
                 return null;
         }catch (Exception e){

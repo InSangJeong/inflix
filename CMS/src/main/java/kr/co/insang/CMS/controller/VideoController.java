@@ -1,7 +1,7 @@
 package kr.co.insang.CMS.controller;
 
 import kr.co.insang.CMS.dto.VideoDTO;
-import kr.co.insang.CMS.dto.watchHistoryDTO;
+import kr.co.insang.CMS.dto.WatchHistoryDTO;
 import kr.co.insang.CMS.service.HistoryService;
 import kr.co.insang.CMS.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,9 +81,11 @@ public class VideoController {
     }
 
     @GetMapping("/history/{userid}")
-    public ResponseEntity<List<watchHistoryDTO>> getWatchHistory(@PathVariable("userid") String userid){
-        List<watchHistoryDTO> result = historyService.getHistorybyUserid(userid);
-
-        return null;
+    public ResponseEntity<List<WatchHistoryDTO>> getWatchHistory(@PathVariable("userid") String userid){
+        List<WatchHistoryDTO> result = historyService.getHistorybyUserid(userid);
+        if(result != null){
+            return new ResponseEntity<List<WatchHistoryDTO>>(result, HttpStatus.OK);
+        }
+        return new ResponseEntity<List<WatchHistoryDTO>>(HttpStatus.NO_CONTENT);
     }
 }

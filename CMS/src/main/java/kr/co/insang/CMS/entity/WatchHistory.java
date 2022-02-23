@@ -1,12 +1,14 @@
 package kr.co.insang.CMS.entity;
 
-import kr.co.insang.CMS.dto.watchHistoryDTO;
+import kr.co.insang.CMS.dto.WatchHistoryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "watchhistory")
@@ -23,21 +25,26 @@ public class WatchHistory {
     @Column(nullable = false)
     private String videoid;
     @Column(nullable = false)
-    private String watchingtate;
+    private String watchingstate;
     @Column(nullable = false)
     private String watchtime;
 
 
 
-    public watchHistoryDTO toDto(){
-        return watchHistoryDTO.builder()
+    public WatchHistoryDTO toDTO(){
+        return WatchHistoryDTO.builder()
                 .historyid(this.historyid)
                 .userid(this.userid)
                 .videoid(videoid)
-                .watchingtate(watchingtate)
+                .watchingstate(watchingstate)
                 .watchtime(watchtime)
                 .build();
     }
 
+    static public List<WatchHistoryDTO> toWatchHistoyDtoList(List<WatchHistory> watchHistory){
+        return watchHistory.stream()
+                .map(WatchHistory::toDTO)
+                .collect(Collectors.toList());
+    }
 
 }
