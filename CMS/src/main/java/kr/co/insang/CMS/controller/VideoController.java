@@ -2,6 +2,7 @@ package kr.co.insang.CMS.controller;
 
 import kr.co.insang.CMS.dto.VideoDTO;
 import kr.co.insang.CMS.dto.WatchHistoryDTO;
+import kr.co.insang.CMS.entity.Video;
 import kr.co.insang.CMS.service.HistoryService;
 import kr.co.insang.CMS.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +37,7 @@ public class VideoController {
     }
 
     @GetMapping("/moviepath/{videoid}")
-    public ResponseEntity<Resource> getVideoPath(@PathVariable String videoid){
+    public ResponseEntity<Resource> getVideoPath(@PathVariable("videoid") String videoid){
         try {
             String fileName = videoService.getVideoPathbyid(videoid);
             String path = resourcePath + fileName;
@@ -54,6 +52,26 @@ public class VideoController {
         }
     }
 
+    @GetMapping("/videoname/{videoid}")
+    public ResponseEntity<String> getVideoName(@PathVariable("videoid") String videoid){
+        VideoDTO video = videoService.getVideoInfoById(videoid);
+        if(video!=null){
+            return new ResponseEntity<String>(video.getTitle(), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<String>("fail", HttpStatus.NOT_FOUND);
+        }
+    }
+    @GetMapping("/videoinfo/{videoid}")
+    public ResponseEntity<VideoDTO> getVideoInfo(@PathVariable("videoid") String videoid){
+        VideoDTO video = videoService.getVideoInfoById(videoid);
+        if(video!=null){
+            return new ResponseEntity<VideoDTO>(video, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<VideoDTO>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @GetMapping("/videolist")
     public List<VideoDTO> getVideoList(){
@@ -87,5 +105,15 @@ public class VideoController {
             return new ResponseEntity<List<WatchHistoryDTO>>(result, HttpStatus.OK);
         }
         return new ResponseEntity<List<WatchHistoryDTO>>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/history/{historyid}")
+    public ResponseEntity<String> deleteHistory(@PathVariable("historyid") String historyid){
+        if(historyService.deleteHistorybyid(historyid)){
+            return new ResponseEntity<String>("Success", HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<String>("fail to delete history...", HttpStatus.ACCEPTED);
+        }
     }
 }

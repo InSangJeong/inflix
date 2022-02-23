@@ -38,4 +38,14 @@ public class HistoryService {
 
     }
 
+    public boolean deleteHistorybyid(String historyid){
+        try{
+            watchHistoryRepository.deleteById(historyid);
+            return true;
+        }catch (Exception e){
+            //logger e..
+            return false;
+        }
+
+    }
 }

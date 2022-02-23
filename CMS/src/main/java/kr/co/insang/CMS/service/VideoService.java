@@ -36,11 +36,14 @@ public class VideoService {
         return toVideoDtoList(videos);
     }
 
-/*    public List<VideoDTO> toListDTO(List<Video> videos){
-        return videos.stream()
-                .map(Video::toDTO)
-                .collect(Collectors.toList());
-    }*/
+    public VideoDTO getVideoInfoById(String videoid){
+        Optional<Video> video = videoRepository.findById(videoid);
+        if(video.isPresent())
+            return video.get().toDTO();
+        else
+            return null;
+    }
+
 
     public String getImagePathByid(String videoid){
         Optional<Video> video = videoRepository.findById(videoid);
