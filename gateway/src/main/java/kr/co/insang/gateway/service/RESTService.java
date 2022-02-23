@@ -29,7 +29,7 @@ public class RESTService {
 
     @Autowired
     public RESTService(){
-        this.gatewayServer = "http://localhost:8000";
+        this.gatewayServer = "http://192.168.0.100:8000";
 
         this.pathLogin="/authen/login";
         this.pathUser = "/authen/user/";
@@ -43,21 +43,25 @@ public class RESTService {
 
     //login server에게 회원정보 요청.(POST)
     public UserDTO getLogin(UserDTO userDto) {
+
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(userDto.toMap(), headers);
         ResponseEntity<UserDTO> response = restTemplate.postForEntity(this.gatewayServer+this.pathLogin, entity, UserDTO.class);
         if(response.hasBody())
             return response.getBody();
         else
             return null;
+
     }
     //login server에게 회원정보 요청.(get)
     public UserDTO getUser(UserDTO userDto) {
+
         String baseUrl = this.gatewayServer+this.pathUser+userDto.getUserid();
         ResponseEntity<UserDTO> response = restTemplate.getForEntity(baseUrl,  UserDTO.class);
         if(response.hasBody())
             return response.getBody();
         else
             return null;
+
     }
 
 }

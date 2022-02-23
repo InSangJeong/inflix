@@ -23,8 +23,15 @@ public class RequestFilter {
         //5.  Post      /autho/tokens                   //로그인으로 R, A 토큰가져오기
         //6.  Get       /autho/tokenstate               //토큰 상태확인.
         //7.  Delete    /autho/tokens                   //토큰 삭제
+        //8. All        /cms/**                         //테스트중으로 일단 모든 CMS접근을 허용한다.
 
         boolean result = true;
+
+        //8번 임시코드
+        if(request.getPath().toString().startsWith("/cms/")) {
+            return false;
+        }
+
         if(request.getMethod().matches("GET") ){
             if(request.getPath().toString().equals("/authen/user")){
                 if (!request.getQueryParams().isEmpty())
