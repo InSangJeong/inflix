@@ -15,10 +15,9 @@ import java.util.stream.Collectors;
 @Builder
 public class WatchHistoryDTO {
 
-    private String historyid;
+    private Long historyid;
     private String userid;
     private String videoid;
-    private String watchingstate;
     private String watchtime;
 
     public WatchHistory toEntity(){
@@ -26,7 +25,6 @@ public class WatchHistoryDTO {
                 .historyid(historyid)
                 .userid(userid)
                 .videoid(videoid)
-                .watchingstate(watchingstate)
                 .watchtime(watchtime)
                 .build();
     }

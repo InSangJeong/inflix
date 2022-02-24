@@ -3,6 +3,7 @@ package kr.co.insang.CMS.controller;
 import kr.co.insang.CMS.dto.VideoDTO;
 import kr.co.insang.CMS.dto.WatchHistoryDTO;
 import kr.co.insang.CMS.entity.Video;
+import kr.co.insang.CMS.entity.WatchHistory;
 import kr.co.insang.CMS.service.HistoryService;
 import kr.co.insang.CMS.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,17 @@ public class VideoController {
             return new ResponseEntity<List<WatchHistoryDTO>>(result, HttpStatus.OK);
         }
         return new ResponseEntity<List<WatchHistoryDTO>>(HttpStatus.NO_CONTENT);
+    }
+    @PostMapping("/history")
+    public ResponseEntity<String> addHistory(@RequestBody WatchHistoryDTO historyDTO) {
+        String result = historyService.createHistory(historyDTO);
+        if(result.startsWith("historyid:")){
+            return new ResponseEntity<String>(result,HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<String>(result,HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping("/history/{historyid}")

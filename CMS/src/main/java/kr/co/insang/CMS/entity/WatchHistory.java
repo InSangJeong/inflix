@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.List;
@@ -19,24 +21,25 @@ import java.util.stream.Collectors;
 public class WatchHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String historyid;
+    private Long historyid;
     @Column(nullable = false)
     private String userid;
     @Column(nullable = false)
     private String videoid;
     @Column(nullable = false)
-    private String watchingstate;
-    @Column(nullable = false)
     private String watchtime;
 
 
-
+    public WatchHistory(String userid, String videoid, String watchtime){
+        this.userid=userid;
+        this.videoid=videoid;
+        this.watchtime=watchtime;
+    }
     public WatchHistoryDTO toDTO(){
         return WatchHistoryDTO.builder()
                 .historyid(this.historyid)
                 .userid(this.userid)
                 .videoid(videoid)
-                .watchingstate(watchingstate)
                 .watchtime(watchtime)
                 .build();
     }

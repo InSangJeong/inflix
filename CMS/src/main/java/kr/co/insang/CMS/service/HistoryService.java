@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static kr.co.insang.CMS.entity.WatchHistory.toWatchHistoyDtoList;
@@ -38,9 +39,21 @@ public class HistoryService {
 
     }
 
+    public String createHistory(WatchHistoryDTO history){
+        try{
+            //WatchHistory result = watchHistoryRepository.save(history.toEntity());
+            //id는 자동 생성.
+            WatchHistory entity =new WatchHistory(history.getUserid(), history.getVideoid(), LocalDateTime.now().toString());
+            WatchHistory result = watchHistoryRepository.save(entity);
+
+            return "historyid:" + result.getHistoryid().toString();
+        }catch (Exception e){
+            return e.toString();
+        }
+    }
     public boolean deleteHistorybyid(String historyid){
         try{
-            watchHistoryRepository.deleteById(historyid);
+            watchHistoryRepository.deleteById(Long.parseLong(historyid));
             return true;
         }catch (Exception e){
             //logger e..
