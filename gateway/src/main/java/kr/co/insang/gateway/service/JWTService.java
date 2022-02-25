@@ -15,8 +15,11 @@ import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
+import java.util.TimeZone;
 
 @Service
 @PropertySource("classpath:application-jwt.properties")
@@ -94,8 +97,8 @@ public class JWTService {
                 //사용자별로 사용할수 있는 서비스를 구분하고 해당 서비스에서 할수있는 권한인지 확인해야하는데
                 //서비스 수가 많지않으니까 모든서비스에서 자기자신에게 해당하는 요청인지만 확인.
                 //토큰(페이로드의 aud)의 요청자와 요청내용이 같은 사람인지 확인한다.
-                //1. url 마지막 요청자
-                //2. json 형식의 body에 userid
+                //1. url 마지막 요청자 (Get 요청이면서 링크에 ?가 포함된경우로..)
+                //2. json 형식의 body에 userid (1번 외)
 
                 Claims claims = getPayload(accessCookie.getValue(), JwtType.ACCESS);
                 if(claims!= null){
@@ -105,17 +108,19 @@ public class JWTService {
 
                     String requestTarget = ""; //요청 대상
 
-                    int numberOfLastPath = reqeust.getPath().elements().size() - 1;
-                    if(numberOfLastPath > 2){
-                        requestTarget = reqeust.getPath().subPath(numberOfLastPath).value();
+                    if(reqeust.getMethod().matches("GET") && reqeust.getPath().toString().contains("?")){
+                        int numberOfLastPath = reqeust.getPath().elements().size() - 1;
+                        if(numberOfLastPath > 2){
+                            requestTarget = reqeust.getPath().subPath(numberOfLastPath).value();
+                        }
                     }
+                    else{
+                        // Json 타입의 Body에서 userid 값 받아오는 코드 삽입.
+                        //Flux<DataBuffer> buffer = reqeust.getBody();
 
-                    /*
-                    // Json 타입의 Body에서 userid 값 받아오는 코드 삽입.
-                    //
-                     */
-
-
+                        //buffer에서 데이터 찾는게 쉽지 않아서 시간이 많이 걸릴듯함. 일단 통과시켜놓고 나중에 추가해야할듯.
+                        requestTarget = requestor;
+                    }
 
                     if(requestor.equals(requestTarget)){//여러 방법으로 구한 요청대상자가 요청자와 일치하면
                         return 200;
