@@ -5,7 +5,7 @@ import kr.co.insang.login.dto.UserDTO;
 public interface UserService {
     //true == success, false == fail
     boolean CreateUser(UserDTO userdto);
-    boolean UpdateUser(UserDTO userdto);
+    UserDTO UpdateUser(UserDTO userdto);
     UserDTO GetUser(UserDTO userdto);
     UserDTO GetUser(String user_id);
     boolean DeleteUser(String user_id);

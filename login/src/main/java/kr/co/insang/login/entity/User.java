@@ -41,6 +41,8 @@ public class User {// implements Serializable {
 
         if(grade==null)//일단 USER로 fix.
             this.grade = "USER";
+        else
+            this.grade = grade;
     }
 
     public UserDTO toDTO(){

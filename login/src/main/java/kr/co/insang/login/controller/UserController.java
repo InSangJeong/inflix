@@ -3,9 +3,9 @@ package kr.co.insang.login.controller;
 import kr.co.insang.login.dto.UserDTO;
 import kr.co.insang.login.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/authen")
@@ -22,14 +22,24 @@ public class UserController {
 
     //중복계정 확인.
     @GetMapping("/user")
-    public boolean checkID(@RequestParam("userid") String userid){
-            return  userService.CheckID(userid);
+    public ResponseEntity<Boolean> checkID(@RequestParam("userid") String userid){
+        if(userService.CheckID(userid)){
+            return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<Boolean>(Boolean.FALSE, HttpStatus.BAD_REQUEST);
+        }
     }
     //회원 가입후 가입 성공 여부 반환.
     @PostMapping("/user")
-    public boolean createUser(@RequestBody UserDTO user){
+    public ResponseEntity<Boolean> createUser(@RequestBody UserDTO user){
         userService.CreateUser(user);
-        return userService.CheckID(user.getUserid());
+        if(userService.CheckID(user.getUserid())){
+            return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<Boolean>(Boolean.FALSE, HttpStatus.BAD_REQUEST);
+        }
+
     }
     //토큰으로 사용자 정보 얻기.(Gateway only)
     @GetMapping("/user/{userid}")
@@ -40,20 +50,22 @@ public class UserController {
     }
     //로그인 매핑.
     @PostMapping("/login")
-    public UserDTO getUserinfo(@RequestBody UserDTO user){
+    public ResponseEntity<UserDTO> getUserinfo(@RequestBody UserDTO user){
         UserDTO userDTO = userService.GetUser(user);
-        return userDTO;
+        return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
     }
     @PutMapping("/user")
-    public UserDTO updateUser(@RequestBody UserDTO user){
-        if(userService.UpdateUser(user))
-            return userService.GetUser(user);
+    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO user){
+        UserDTO changedUser = userService.UpdateUser(user);
+        if(changedUser!=null)
+            return new ResponseEntity<UserDTO>(changedUser, HttpStatus.OK);
         else
-            return null;
+            return new ResponseEntity<UserDTO>(HttpStatus.BAD_REQUEST);
     }
+
     @DeleteMapping("/user/{userid}")
-    public boolean deleteUser(@PathVariable("userid") String userid){
-        return userService.DeleteUser(userid);
+    public ResponseEntity<String> deleteUser(@PathVariable("userid") String userid){
+        return new ResponseEntity<String>("byebye", HttpStatus.OK);
     }
 
 }
