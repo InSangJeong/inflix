@@ -3,19 +3,18 @@ package kr.co.insang.login.service.impl;
 import kr.co.insang.login.dto.UserDTO;
 import kr.co.insang.login.entity.User;
 import kr.co.insang.login.repository.UserRepository;
+import kr.co.insang.login.service.RESTService;
 import kr.co.insang.login.service.UserService;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
-    Logger logger;
+
     UserRepository userRepo;
 
     @Autowired

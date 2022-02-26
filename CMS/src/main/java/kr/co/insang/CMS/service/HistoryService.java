@@ -59,6 +59,15 @@ public class HistoryService {
             //logger e..
             return false;
         }
-
+    }
+    public boolean deleteHistorybyUserid(String userid){
+        try{
+            //삭제한 엔티티수가 나옴.
+            Long debug = watchHistoryRepository.deleteByuserid(userid);
+            return true;
+        }catch (Exception e){
+            //logger e..
+            return false;
+        }
     }
 }

@@ -128,4 +128,14 @@ public class VideoController {
             return new ResponseEntity<String>("fail to delete history...", HttpStatus.ACCEPTED);
         }
     }
+
+    @DeleteMapping("/allhistory/{userid}")
+    public ResponseEntity<String> deleteHistorybyUserid(@PathVariable("userid") String userid){
+        if(historyService.deleteHistorybyUserid(userid)){
+            return new ResponseEntity<String>("Success", HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<String>("fail to delete History.", HttpStatus.ACCEPTED);
+        }
+    }
 }
