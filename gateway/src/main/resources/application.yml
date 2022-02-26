@@ -10,7 +10,10 @@ spring:
         cors-configurations:
           '[/**]':
             allowed-origins:
+              - "http://192.168.0.100:8000"
+              - "http://192.168.0.100:8080"
               - "http://localhost:8080"
+              - "http://localhost:8000"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
@@ -26,6 +29,7 @@ spring:
             postLogger: true
       routes:
         - id: login
+          #uri: http://192.168.0.100:9000/
           uri: http://localhost:9000/
           predicates:
             - Path=/authen/** #- Path=/authen/**, /login/**
@@ -35,6 +39,22 @@ spring:
                 baseMessage: Spring Cloud Gateway LoginFilter
                 preLogger: true
                 postLogger: true
+        - id: cms
+          #uri: http://192.168.0.100:9001/
+          uri: http://localhost:9001/
+          predicates:
+            - Path=/cms/** #- Path=/authen/**, /login/**
+          filters:
+            - name: CMSFilter
+              args:
+                baseMessage: Spring Cloud Gateway CMSFilter
+                preLogger: true
+                postLogger: true
+        - id: autho
+          uri: http://localhost:8000/
+          predicates:
+            - Path=/autho/**
+
 
         #- id: Autho
         #  uri: http://localhost:8000/
