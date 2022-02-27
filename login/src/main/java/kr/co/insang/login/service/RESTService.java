@@ -22,8 +22,8 @@ public class RESTService {
     @Autowired
     public RESTService(){
         //나중에 파일로 받도록 변경.
-        //pathCMS="http://localhost:8000/cms";
-        pathCMS="http://localhost:9001/cms";
+        //pathCMS="http://localhost:9001/cms";
+        pathCMS="http://192.168.0.100:9001/cms";
 
         this.restTemplate = new RestTemplate();
         //this.headers = new HttpHeaders();

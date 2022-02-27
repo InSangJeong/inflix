@@ -66,7 +66,7 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
 
                     //내 프로젝트에서는 Cookies 사용하므로 ACAO를 *로 표현할수 없으니 아래처럼 헤더를 추가해서 반환.
                     HttpHeaders headers = exchange.getResponse().getHeaders();
-                    headers.set("Access-Control-Allow-Origin", "http://localhost:8080");
+                    headers.set("Access-Control-Allow-Origin", "http://192.168.0.100:8080");//"http://localhost:8080");
                 }
             }));
         });
