@@ -13,7 +13,8 @@ public class CorsGlobalConfiguration implements WebFluxConfigurer {
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 //.allowedOrigins("http://localhost:8080")
-                .allowedOrigins("http://192.168.0.100:8080")
+                //.allowedOrigins("http://192.168.0.100:8080")
+                .allowedOrigins("https://www.insang.co.kr")
                 .allowedMethods("*")
                 .allowCredentials(true)
                 .allowedHeaders("*")

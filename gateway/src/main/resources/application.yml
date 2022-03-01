@@ -29,7 +29,7 @@ spring:
             postLogger: true
       routes:
         - id: login
-          uri: http://192.168.0.100:9000/
+          uri: http://10.0.1.168:9000/
           #uri: http://localhost:9000/
           predicates:
             - Path=/authen/** #- Path=/authen/**, /login/**
@@ -40,7 +40,8 @@ spring:
                 preLogger: true
                 postLogger: true
         - id: cms
-          uri: http://192.168.0.100:9001/
+          #uri: http://192.168.0.100:9001/
+          uri: http://10.0.1.168:9001/
           #uri: http://localhost:9001/
           predicates:
             - Path=/cms/** #- Path=/authen/**, /login/**
@@ -52,7 +53,7 @@ spring:
                 postLogger: true
         - id: autho
           #uri: http://localhost:8000/
-          uri: http://192.168.0.100:8000/
+          uri: http://10.0.1.168:8000/
           predicates:
             - Path=/autho/**
 

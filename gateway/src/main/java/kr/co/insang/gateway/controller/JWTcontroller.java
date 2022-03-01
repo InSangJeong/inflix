@@ -46,9 +46,9 @@ public class JWTcontroller {
             else{
 
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
-                                .httpOnly(true).path("/").domain("192.168.0.100").maxAge(JwtType.REFRESH.getTime()).build();
+                                .httpOnly(true).path("/").domain("insang.co.kr").maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                        .httpOnly(true).path("/").domain("192.168.0.100").maxAge(JwtType.ACCESS.getTime()).build();
+                        .httpOnly(true).path("/").domain("insang.co.kr").maxAge(JwtType.ACCESS.getTime()).build();
                                 //.secure(true)
 
                 exchange.getResponse().addCookie(refreshCookie);
