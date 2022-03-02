@@ -14,18 +14,18 @@ import kr.co.insang.gateway.service.RESTService;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-
 @RestController
 @RequestMapping("/autho")
 public class JWTcontroller {
     private RESTService restService;
     private JWTService jwtService;
+    private String domain;
 
     @Autowired
     public JWTcontroller(RESTService restService, JWTService jwtService){
         this.restService = restService;
         this.jwtService = jwtService;
+        this.domain = "insang.co.kr";
     }
 
     //get Access, Refresh Tokens.
@@ -35,9 +35,7 @@ public class JWTcontroller {
         UserDTO userinfo = restService.getLogin(userDto);
 
         if(userinfo != null){
-
             String refreshToken = jwtService.makeRefreshToken(userinfo);
-
             String accessToken = jwtService.makeAccessToken(refreshToken);
 
             if(accessToken=="invalid"){
@@ -46,9 +44,9 @@ public class JWTcontroller {
             else{
 
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
-                                .httpOnly(true).path("/").domain("insang.co.kr").maxAge(JwtType.REFRESH.getTime()).build();
+                                .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                        .httpOnly(true).path("/").domain("insang.co.kr").maxAge(JwtType.ACCESS.getTime()).build();
+                        .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
                                 //.secure(true)
 
                 exchange.getResponse().addCookie(refreshCookie);
@@ -57,9 +55,6 @@ public class JWTcontroller {
                 return Mono.just(userinfo);
             }
         }
-        //return ServerResponse.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(Mono.just("Fail."), String.class);
         return Mono.empty();
     }
 
@@ -110,7 +105,7 @@ public class JWTcontroller {
                 String accessToken = jwtService.makeAccessToken(refreshCookie.getValue());
                 if(accessToken != "invalid"){//엑세스 토큰이 만들어졌으면 쿠키로 만들어서 httponly로 설정.
                     ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                            .httpOnly(true).path("/").domain("localhost").maxAge(JwtType.ACCESS.getTime()).build();
+                            .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
                     exchange.getResponse().addCookie(accessCookie);
                     result = "Success";
                 }
@@ -127,9 +122,9 @@ public class JWTcontroller {
     //쿠키를 강제로 삭제할수 없으므로 만료시간을 현재로 맞춰 삭제.
     public Mono<String> deleteTokens(ServerWebExchange exchange){
         ResponseCookie rCookie = ResponseCookie.from("refreshToken","deleted")
-                .httpOnly(true).path("/").domain("localhost").maxAge(0).build();
+                .httpOnly(true).path("/").domain(this.domain).maxAge(0).build();
         ResponseCookie aCookie = ResponseCookie.from("accessToken","deleted")
-                .httpOnly(true).path("/").domain("localhost").maxAge(0).build();
+                .httpOnly(true).path("/").domain(this.domain).maxAge(0).build();
 
         exchange.getResponse().addCookie(rCookie);
         exchange.getResponse().addCookie(aCookie);

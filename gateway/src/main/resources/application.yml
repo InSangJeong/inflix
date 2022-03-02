@@ -10,10 +10,11 @@ spring:
         cors-configurations:
           '[/**]':
             allowed-origins:
-              - "http://192.168.0.100:8000"
-              - "http://192.168.0.100:8080"
-              - "http://localhost:8080"
-              - "http://localhost:8000"
+              - "https://www.insang.co.kr"
+#              - "http://192.168.0.100:8000"
+#              - "http://192.168.0.100:8080"
+#              - "http://localhost:8080"
+#              - "http://localhost:8000"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true

@@ -27,20 +27,11 @@ public class LoginFilter extends AbstractGatewayFilterFactory<LoginFilter.Config
             ServerHttpRequest httpRequest = exchange.getRequest();
 
             if (config.isPreLogger()) {
-                logger.info("LoginFilter Start>>>>>>" + exchange.getRequest());
+                ;
             }
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {
-                    ServerHttpResponse httpRespone = exchange.getResponse();
-                    DataBufferFactory dbf = httpRespone.bufferFactory();
 
-
-                    //exchange.getResponse().getHeaders().add("Access-Control-Allow-Credentials", "true");
-
-
-
-
-                    logger.info("LoginFilter End>>>>>>" + exchange.getResponse());
                 }
             }));
         });

@@ -20,11 +20,11 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
         return ((exchange, chain) -> {
             logger.info("AuthFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
-                logger.info("AuthFilter Start>>>>>>" + exchange.getRequest());
+
             }
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {
-                    logger.info("AuthFilter End>>>>>>" + exchange.getResponse());
+
                 }
             }));
         });

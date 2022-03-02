@@ -13,6 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .maxAge(3600);
+
         /*
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:8080", "http://localhost:8000")

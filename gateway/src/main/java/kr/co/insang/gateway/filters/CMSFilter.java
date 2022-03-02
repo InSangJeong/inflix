@@ -20,11 +20,11 @@ public class CMSFilter extends AbstractGatewayFilterFactory<CMSFilter.Config> {
         return ((exchange, chain) -> {
             logger.info("CMSFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
-                logger.info("CMSFilter Start>>>>>>" + exchange.getRequest());
+
             }
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {
-                    logger.info("CMSFilter End>>>>>>" + exchange.getResponse());
+
                 }
             }));
         });

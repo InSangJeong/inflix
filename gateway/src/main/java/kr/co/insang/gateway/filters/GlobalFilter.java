@@ -10,7 +10,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -35,24 +34,42 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
         return ((exchange, chain) -> {
             logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
-                logger.info("GlobalFilter Start>>>>>>" + exchange.getRequest());
+                if(exchange.getRequest().getMethod().matches("POST")){
+                    HttpHeaders debug =exchange.getRequest().getHeaders();
+                    logger.info("!!!!!!!inbound!!!!!!!!!!");
+                    exchange.getRequest().getHeaders().forEach((key, value) -> {
+                        if(key != null){
+                            if(!value.isEmpty()){
+                                logger.info("header : " + key +
+                                        ", value : " + value.toString());
+                            }
+                            else{
+                                logger.info("header : " + key +
+                                        ", value : empty.");
+                            }
+
+                        }
+
+                    });
+
+                }
+
             }
             //application.yml에서 predicates를 이용해서 하려고했는데 더 복잡할듯해서 여기에다가함.
             //토큰이 필요한 요청인 경우 httponly(cookie) 토큰이 검증된 경우에만 pass한다.
             if(requestFilter.filterRequest(exchange.getRequest())){                 //토큰 검증 필요
                 int result = jwtService.isValuedToken(exchange.getRequest());
                 if(result == 200){         //유효한 토큰이며 유효한 요청.
-                    //exchange.getResponse().getHeaders().add("gateway", "200");;
+                    logger.info("Available Request... : " + exchange.getRequest().getPath().toString());
                     ;
                 }
                 else if(result == 403){    //유효하지 않은 토큰 403 return
+                    logger.info("Get 403 Request... : " + exchange.getRequest().getPath().toString());
                     return handleUnAuthorized(exchange,HttpStatus.FORBIDDEN); // 403 Error
                 }
                 else{                                                           //유효하지 않은 요청 401 return
+                    logger.info("UnAuthorized Request... : " + exchange.getRequest().getPath().toString());
                     return handleUnAuthorized(exchange,HttpStatus.UNAUTHORIZED); // 401 Error
-
-                    //exchange.getResponse().getHeaders().add("gateway", "401");
-                    //exchange.getResponse().getHeaders().set("status", "401");
                 }
             }
             else{//토큰 검증 X
@@ -62,11 +79,25 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
 
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {
-                    logger.info("GlobalFilter End>>>>>>" + exchange.getResponse());
 
                     //내 프로젝트에서는 Cookies 사용하므로 ACAO를 *로 표현할수 없으니 아래처럼 헤더를 추가해서 반환.
                     HttpHeaders headers = exchange.getResponse().getHeaders();
-                    headers.set("Access-Control-Allow-Origin", "https://www.insang.co.kr");//"http://localhost:8080");
+                    //if(headers.get("Access-Control-Allow-Origin").isEmpty())
+                        headers.set("Access-Control-Allow-Origin", "https://www.insang.co.kr");//"http://localhost:8080");
+
+                    if(exchange.getRequest().getMethod().matches("POST")) {
+                        logger.info(String.format("!!!!!!!outbound!!!!!!!!!!"));
+                        exchange.getRequest().getHeaders().forEach((key, value) -> {
+                            if(!value.isEmpty()){
+                                logger.info("header : " + key +
+                                        ", value : " + value.toString());
+                            }
+                            else{
+                                logger.info("header : " + key +
+                                        ", value : empty.");
+                            }
+                        });
+                    }
                 }
             }));
         });
