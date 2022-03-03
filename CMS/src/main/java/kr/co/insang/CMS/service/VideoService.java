@@ -15,13 +15,10 @@ import static kr.co.insang.CMS.entity.Video.toVideoDtoList;
 @Service
 @Transactional
 public class VideoService {
-    VideoRepository videoRepository;
-
 
     @Autowired
-    public VideoService(VideoRepository videoRepository){
-        this.videoRepository = videoRepository;
-    }
+    VideoRepository videoRepository;
+
 
     public String getVideoPathbyid(String videoid){
         Optional<Video> video = videoRepository.findById(videoid);
@@ -36,6 +33,18 @@ public class VideoService {
         return toVideoDtoList(videos);
     }
 
+    public List<VideoDTO> getRandomVideos(int cnt){
+
+        //영상을 다 불러오는게아니라 사이즈만 가져오는 방법이 있을듯한데...
+        int maxCntVideos = videoRepository.findAll().size();
+
+        if(0< cnt && cnt < maxCntVideos){
+            List<Video> videos = videoRepository.findRandomVideos(cnt);
+            return toVideoDtoList(videos);
+        }
+        return null;
+    }
+
     public VideoDTO getVideoInfoById(String videoid){
         Optional<Video> video = videoRepository.findById(videoid);
         if(video.isPresent())
@@ -43,7 +52,6 @@ public class VideoService {
         else
             return null;
     }
-
 
     public String getImagePathByid(String videoid){
         Optional<Video> video = videoRepository.findById(videoid);

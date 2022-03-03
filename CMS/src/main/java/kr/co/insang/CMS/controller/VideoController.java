@@ -28,14 +28,12 @@ import java.util.List;
 public class VideoController {
     @Value("${resourcePath}")
     String resourcePath;
+    final static int maxVideoCount=10;
 
-    VideoService videoService;
-    HistoryService historyService;
     @Autowired
-    public VideoController(VideoService videoService, HistoryService historyService){
-        this.videoService = videoService;
-        this.historyService = historyService;
-    }
+    VideoService videoService;
+    @Autowired
+    HistoryService historyService;
 
     @GetMapping("/moviepath/{videoid}")
     public ResponseEntity<Resource> getVideoPath(@PathVariable("videoid") String videoid){
@@ -63,6 +61,8 @@ public class VideoController {
             return new ResponseEntity<String>("fail", HttpStatus.NOT_FOUND);
         }
     }
+
+
     @GetMapping("/videoinfo/{videoid}")
     public ResponseEntity<VideoDTO> getVideoInfo(@PathVariable("videoid") String videoid){
         VideoDTO video = videoService.getVideoInfoById(videoid);
@@ -79,13 +79,28 @@ public class VideoController {
         return videoService.getAllVideos();
     }
 
+    @GetMapping("/randomvideos/{cntvideo}")
+    public ResponseEntity<List<VideoDTO>> getRandomVideos(@PathVariable("cntvideo")int cntVideo){
+      if(0 < cntVideo && cntVideo < this.maxVideoCount ){
+        List<VideoDTO> videos = videoService.getRandomVideos(cntVideo);
+        if(videos != null)
+            return new ResponseEntity<List<VideoDTO>>(videos, HttpStatus.OK);
+        else{
+            ;//something wrong.
+        }
+      }
+      //요청한 영상의 수가 0이하 이거나 서버가 가진 모든 비디오 수보다 많음.
+      return new ResponseEntity<List<VideoDTO>>(HttpStatus.BAD_REQUEST);
+    };
+
+
     @GetMapping("/imagepath/{videoid}")
     public ResponseEntity<Resource> getImageByid(@PathVariable("videoid") String videoid) {
         try {
             String path = videoService.getImagePathByid(videoid);
             FileSystemResource resource = new FileSystemResource(resourcePath + path);
             if (!resource.exists()) {
-                return new ResponseEntity<Resource>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<Resource>(HttpStatus.NO_CONTENT);
                 //throw new NotFoundImageException();
             }
             HttpHeaders header = new HttpHeaders();
@@ -94,8 +109,7 @@ public class VideoController {
             header.add("Content-Type", Files.probeContentType(filePath));
             return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
         } catch (Exception e) {
-
-           return new ResponseEntity<Resource>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Resource>(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -110,6 +124,7 @@ public class VideoController {
     @PostMapping("/history")
     public ResponseEntity<String> addHistory(@RequestBody WatchHistoryDTO historyDTO) {
         String result = historyService.createHistory(historyDTO);
+
         if(result.startsWith("historyid:")){
             return new ResponseEntity<String>(result,HttpStatus.OK);
         }

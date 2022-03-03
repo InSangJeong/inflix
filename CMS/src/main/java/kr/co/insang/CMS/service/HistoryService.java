@@ -1,27 +1,32 @@
 package kr.co.insang.CMS.service;
 
 import kr.co.insang.CMS.dto.WatchHistoryDTO;
+import kr.co.insang.CMS.entity.Video;
 import kr.co.insang.CMS.entity.WatchHistory;
+import kr.co.insang.CMS.repository.VideoRepository;
 import kr.co.insang.CMS.repository.WatchHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static kr.co.insang.CMS.entity.WatchHistory.toWatchHistoyDtoList;
 
 @Service
 @Transactional
 public class HistoryService {
+    @Autowired
     WatchHistoryRepository watchHistoryRepository;
 
-
     @Autowired
-    public HistoryService(WatchHistoryRepository watchHistoryRepository){
-        this.watchHistoryRepository = watchHistoryRepository;
-    }
+    VideoRepository videoRepository;
 
     public List<WatchHistoryDTO> getHistorybyUserid(String userid){
         try{
@@ -41,14 +46,22 @@ public class HistoryService {
 
     public String createHistory(WatchHistoryDTO history){
         try{
-            //WatchHistory result = watchHistoryRepository.save(history.toEntity());
-            //id는 자동 생성.
-            WatchHistory entity =new WatchHistory(history.getUserid(), history.getVideoid(), LocalDateTime.now().toString());
-            WatchHistory result = watchHistoryRepository.save(entity);
+            Optional<Video> video = videoRepository.findById(history.getVideo().getVideoid());
+            if(video.isPresent()){
 
-            return "historyid:" + result.getHistoryid().toString();
+                history.setVideo(video.get());
+
+                ZonedDateTime nowSeoul = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd.HH-mm-ss");
+                history.setWatchtime(nowSeoul.format(formatter));
+
+                WatchHistory historyentity = history.toEntity();
+                WatchHistory result = watchHistoryRepository.save(historyentity);
+                return "historyid:" + result.getHistoryid().toString();
+            }
+            return "Video of History is null!";
         }catch (Exception e){
-            return e.toString();
+            return "Video of History is null!  " + e.toString()  ;
         }
     }
     public boolean deleteHistorybyid(String historyid){

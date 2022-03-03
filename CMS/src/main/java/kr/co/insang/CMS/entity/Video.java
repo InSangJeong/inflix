@@ -1,18 +1,16 @@
 package kr.co.insang.CMS.entity;
 
 import kr.co.insang.CMS.dto.VideoDTO;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "Video")
+@Data
 @NoArgsConstructor
-@Getter
 public class Video {
 
     @Id
@@ -29,6 +27,11 @@ public class Video {
     @Column(nullable = false)
     private String genre;
 
+    //지금은 단방향으로 충분.
+    //@OneToMany(mappedBy = "video")
+    //private List<WatchHistory> histories = new ArrayList<>();
+
+
     @Builder
     public Video(String videoid, String title, String runningtime, String pathposter, String pathsource, String genre){
         this.videoid = videoid;
@@ -40,14 +43,7 @@ public class Video {
     }
 
     public VideoDTO toDTO(){
-        return VideoDTO.builder()
-                .videoid(videoid)
-                .title(title)
-                .runningtime(runningtime)
-                .pathposter(pathposter)
-                .pathsource(pathsource)
-                .genre(genre)
-                .build();
+        return new VideoDTO(this.videoid, this.title, this.runningtime, this.pathposter, this.pathsource, this.genre);
     }
     static public List<VideoDTO> toVideoDtoList(List<Video> video){
         return video.stream()

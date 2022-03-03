@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+//@Builder
 public class VideoDTO {
     private String videoid;
     private String title;
