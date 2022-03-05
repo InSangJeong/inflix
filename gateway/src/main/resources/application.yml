@@ -11,10 +11,6 @@ spring:
           '[/**]':
             allowed-origins:
               - "https://www.insang.co.kr"
-#              - "http://192.168.0.100:8000"
-#              - "http://192.168.0.100:8080"
-#              - "http://localhost:8080"
-#              - "http://localhost:8000"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
@@ -31,7 +27,6 @@ spring:
       routes:
         - id: login
           uri: http://10.0.1.168:9000/
-          #uri: http://localhost:9000/
           predicates:
             - Path=/authen/** #- Path=/authen/**, /login/**
           filters:
@@ -41,9 +36,7 @@ spring:
                 preLogger: true
                 postLogger: true
         - id: cms
-          #uri: http://192.168.0.100:9001/
           uri: http://10.0.1.168:9001/
-          #uri: http://localhost:9001/
           predicates:
             - Path=/cms/** #- Path=/authen/**, /login/**
           filters:
@@ -53,20 +46,11 @@ spring:
                 preLogger: true
                 postLogger: true
         - id: autho
-          #uri: http://localhost:8000/
           uri: http://10.0.1.168:8000/
           predicates:
             - Path=/autho/**
 
-
-        #- id: Autho
-        #  uri: http://localhost:8000/
-        #  predicates:
-        #   - Path=/autho/**
-        #  filters:
-        #    - name: AuthFilter
-        #      args:
-        #        baseMessage: Spring Cloud Gateway AuthoFilter
-        #        preLogger: true
-        #        postLogger: true
-
+        - id: comment
+          uri: http://10.0.1.168:9003/
+          predicates:
+            - Path=/comment/**

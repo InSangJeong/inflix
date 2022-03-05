@@ -6,8 +6,6 @@ import kr.co.insang.gateway.service.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import kr.co.insang.gateway.service.RESTService;
@@ -38,15 +36,15 @@ public class JWTcontroller {
             String refreshToken = jwtService.makeRefreshToken(userinfo);
             String accessToken = jwtService.makeAccessToken(refreshToken);
 
-            if(accessToken=="invalid"){
+            if(accessToken.equals("invalid")){
                 return Mono.empty();
             }
             else{
 
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
-                                .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.REFRESH.getTime()).build();
+                                .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.REFRESH.getTime()).sameSite("None").build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                        .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
+                        .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).sameSite("None").build();
                                 //.secure(true)
 
                 exchange.getResponse().addCookie(refreshCookie);
@@ -97,39 +95,38 @@ public class JWTcontroller {
     @GetMapping("/accesstoken")
     public Mono<String> getAccessToken(ServerWebExchange exchange) throws Exception{
         MultiValueMap<String, HttpCookie> cookies = exchange.getRequest().getCookies();
-        String result = "";
         HttpCookie refreshCookie = cookies.getFirst("refreshToken");
 
-        if(refreshCookie!=null){
-            if(jwtService.verifyToken(refreshCookie.getValue(), JwtType.REFRESH)){
+        if(refreshCookie!=null) {
+            if (jwtService.verifyToken(refreshCookie.getValue(), JwtType.REFRESH)) {
                 String accessToken = jwtService.makeAccessToken(refreshCookie.getValue());
-                if(accessToken != "invalid"){//엑세스 토큰이 만들어졌으면 쿠키로 만들어서 httponly로 설정.
-                    ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                            .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
+                if (!accessToken.equals("invalid")) {//엑세스 토큰이 만들어졌으면 쿠키로 만들어서 httponly로 설정.
+                    ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                            .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).sameSite("None").build();
                     exchange.getResponse().addCookie(accessCookie);
-                    result = "Success";
+                    return Mono.just("Success");
                 }
             }
-            else
-                result = "Fail";
-        }else{
-            result = "Fail";
         }
-        return Mono.just(result);
+        return Mono.just("Fail");
     }
 
     @DeleteMapping("/tokens")
     //쿠키를 강제로 삭제할수 없으므로 만료시간을 현재로 맞춰 삭제.
-    public Mono<String> deleteTokens(ServerWebExchange exchange){
-        ResponseCookie rCookie = ResponseCookie.from("refreshToken","deleted")
-                .httpOnly(true).path("/").domain(this.domain).maxAge(0).build();
-        ResponseCookie aCookie = ResponseCookie.from("accessToken","deleted")
-                .httpOnly(true).path("/").domain(this.domain).maxAge(0).build();
+    public Mono<Boolean> deleteTokens(ServerWebExchange exchange){
+        try{
+            ResponseCookie rCookie = ResponseCookie.from("refreshToken","deleted")
+                    .httpOnly(true).path("/").domain(this.domain).maxAge(0).sameSite("None").build();
+            ResponseCookie aCookie = ResponseCookie.from("accessToken","deleted")
+                    .httpOnly(true).path("/").domain(this.domain).maxAge(0).sameSite("None").build();
 
-        exchange.getResponse().addCookie(rCookie);
-        exchange.getResponse().addCookie(aCookie);
+            exchange.getResponse().addCookie(rCookie);
+            exchange.getResponse().addCookie(aCookie);
 
-        return Mono.just("Success");
+            return Mono.just(true);
+        }catch(Exception e){
+            return Mono.just(false);
+        }
     }
 
 }

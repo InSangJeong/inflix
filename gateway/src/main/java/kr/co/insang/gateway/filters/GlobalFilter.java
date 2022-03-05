@@ -34,28 +34,8 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
         return ((exchange, chain) -> {
             logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
-                if(exchange.getRequest().getMethod().matches("POST")){
-                    HttpHeaders debug =exchange.getRequest().getHeaders();
-                    logger.info("!!!!!!!inbound!!!!!!!!!!");
-                    exchange.getRequest().getHeaders().forEach((key, value) -> {
-                        if(key != null){
-                            if(!value.isEmpty()){
-                                logger.info("header : " + key +
-                                        ", value : " + value.toString());
-                            }
-                            else{
-                                logger.info("header : " + key +
-                                        ", value : empty.");
-                            }
-
-                        }
-
-                    });
-
-                }
-
             }
-            //application.yml에서 predicates를 이용해서 하려고했는데 더 복잡할듯해서 여기에다가함.
+            //application.yml에서 predicates를 이용해서 하려했는데 더 복잡할듯해서 여기에다가함.
             //토큰이 필요한 요청인 경우 httponly(cookie) 토큰이 검증된 경우에만 pass한다.
             if(requestFilter.filterRequest(exchange.getRequest())){                 //토큰 검증 필요
                 int result = jwtService.isValuedToken(exchange.getRequest());
@@ -72,32 +52,11 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
                     return handleUnAuthorized(exchange,HttpStatus.UNAUTHORIZED); // 401 Error
                 }
             }
-            else{//토큰 검증 X
-                ;
-            }
+
 
 
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {
-
-                    //내 프로젝트에서는 Cookies 사용하므로 ACAO를 *로 표현할수 없으니 아래처럼 헤더를 추가해서 반환.
-                    HttpHeaders headers = exchange.getResponse().getHeaders();
-                    //if(headers.get("Access-Control-Allow-Origin").isEmpty())
-                        headers.set("Access-Control-Allow-Origin", "https://www.insang.co.kr");//"http://localhost:8080");
-
-                    if(exchange.getRequest().getMethod().matches("POST")) {
-                        logger.info(String.format("!!!!!!!outbound!!!!!!!!!!"));
-                        exchange.getRequest().getHeaders().forEach((key, value) -> {
-                            if(!value.isEmpty()){
-                                logger.info("header : " + key +
-                                        ", value : " + value.toString());
-                            }
-                            else{
-                                logger.info("header : " + key +
-                                        ", value : empty.");
-                            }
-                        });
-                    }
                 }
             }));
         });

@@ -24,11 +24,12 @@ public class RequestFilter {
         //6.  Get       /autho/tokenstate               //토큰 상태확인.
         //7.  Delete    /autho/tokens                   //토큰 삭제
         //8. All        /cms/**                         //테스트중으로 일단 모든 CMS접근을 허용한다.
+        //9. All        /comment
 
         boolean result = true;
 
         //8번 임시코드
-        if(request.getPath().toString().startsWith("/cms/")) {
+        if(request.getPath().toString().startsWith("/cms/") || request.getPath().toString().startsWith("/comment")) {
             return false;
         }
 

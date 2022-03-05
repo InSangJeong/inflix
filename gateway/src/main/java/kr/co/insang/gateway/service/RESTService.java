@@ -29,8 +29,7 @@ public class RESTService {
 
     @Autowired
     public RESTService(){
-        //this.gatewayServer = "http://192.168.0.100:8000";
-        this.gatewayServer = "http://localhost:8000";
+        this.gatewayServer = "http://10.0.1.168:8000";
 
         this.pathLogin="/authen/login";
         this.pathUser = "/authen/user/";
@@ -39,7 +38,6 @@ public class RESTService {
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        //headers.setAccessControlAllowOrigin("gatewayServer");
         headers.setAccessControlAllowCredentials(true);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     }
