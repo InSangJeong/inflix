@@ -14,14 +14,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .maxAge(3600);
 
-        /*
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8080", "http://localhost:8000")
-                .allowedMethods("GET", "POST","PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("x-requested-with", "authorization", "content-type", "credential", "X-AUTH-TOKEN", "X-CSRF-TOKEN")//.allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3000);
-         */
 
     }
 }

@@ -1,7 +1,6 @@
 package kr.co.insang.login.controller;
 
 import kr.co.insang.login.dto.UserDTO;
-import kr.co.insang.login.service.RESTService;
 import kr.co.insang.login.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,16 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/authen")
 public class UserController {
-    //토큰 없이 접근 가능(checkID, createUser) 그 외에는 토큰 있는경우에만 접근가능.
-    //직접 접근하지 못하도록 Gateway만 통신 가능하도록 방화벽 설정하고 Gateway에서도 인가로직 거칠예정.
-
     private UserService userService;
-    private RESTService restService;
 
     @Autowired
-    public UserController(UserService userService, RESTService restService){
+    public UserController(UserService userService){
         this.userService = userService;
-        this.restService = restService;
     }
 
     //중복계정 확인.
@@ -69,7 +63,6 @@ public class UserController {
             UserDTO userDTO = userService.GetUser(user);
             return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
         }catch (Exception e){
-            System.out.println("로그인실패 GetUser에서 DTO를 못받음.");
             return new ResponseEntity<UserDTO>(HttpStatus.OK);
         }
 

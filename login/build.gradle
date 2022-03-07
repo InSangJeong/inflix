@@ -29,6 +29,8 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	//add jpa
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+
 
 	//add mariadb
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

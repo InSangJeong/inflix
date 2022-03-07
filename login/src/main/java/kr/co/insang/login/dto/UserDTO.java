@@ -29,7 +29,6 @@ public class UserDTO {
                 .grade(grade)
                 .build();
     }
-
     //기존유저의 정보를 after 유저의 정보로 바꾼다.
     //22.2.25기준 변경할수 있는 정보는 비밀번호, 닉네임, 이메일주소만.
     public void updateUser(UserDTO afterUser){
@@ -39,6 +38,9 @@ public class UserDTO {
             this.nickname = afterUser.nickname;
         if(afterUser.getEmail()!=null)
             this.email = afterUser.email;
+    }
+    public void setchPassword(String newPassword){
+        this.chpassword = newPassword;
     }
 
 

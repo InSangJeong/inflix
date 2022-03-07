@@ -5,7 +5,6 @@ import javax.persistence.*;
 import kr.co.insang.login.dto.UserDTO;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,6 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 public class User {// implements Serializable {
+
+
 
     @Id
     @Column(nullable = false)
@@ -64,6 +65,7 @@ public class User {// implements Serializable {
                 .grade(this.grade)
                 .build();
     }
+
 
 
 }
