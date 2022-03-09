@@ -81,7 +81,7 @@ public class JWTService {
     //    구조가 맘에 안드는데 다른사람들은 어떻게 적용했는지 사례를 보고 바꿀 필요가 있어보임. 일단 이대로 진행.
     public int isValuedToken(ServerHttpRequest reqeust) {
         try {
-            String requestor = "";
+
 
             //쿠키에 토큰이 있는지 확인
             HttpCookie accessCookie = reqeust.getCookies().getFirst("accessToken");
@@ -94,16 +94,15 @@ public class JWTService {
 
                 Claims claims = getPayload(accessCookie.getValue(), JwtType.ACCESS);
                 if(claims!= null){
-                    requestor = claims.getAudience();    //요청자(토큰)
-                    if(requestor.equals("") || requestor==null)
+                    String requestor = claims.getAudience();    //요청자(토큰)
+                    if(requestor==null)
                         return 403;//aud항목이 없으므로 잘못된 토큰임.
-
-                    String requestTarget = ""; //요청 대상
 
                     if(reqeust.getMethod().matches("GET") && reqeust.getPath().toString().contains("?")){
                         int numberOfLastPath = reqeust.getPath().elements().size() - 1;
                         if(numberOfLastPath > 2){
-                            requestTarget = reqeust.getPath().subPath(numberOfLastPath).value();
+                            if(requestor.equals(reqeust.getPath().subPath(numberOfLastPath).value()))
+                                return 200;
                         }
                     }
                     else{
@@ -111,16 +110,9 @@ public class JWTService {
                         //Flux<DataBuffer> buffer = reqeust.getBody();
 
                         //buffer에서 데이터 찾는게 쉽지 않아서 시간이 많이 걸릴듯함. 일단 통과시켜놓고 나중에 추가해야할듯.
-                        requestTarget = requestor;
-                    }
-
-                    if(requestor.equals(requestTarget)){//여러 방법으로 구한 요청대상자가 요청자와 일치하면
                         return 200;
                     }
-                    else{
-                        //요청자에게 권한이 없으므로 401 반환.
-                        return 401;
-                    }
+                    return 401;
                 }
                 else{
                     return 403;//클레임이 없으므로 잘못된 토큰.
@@ -150,7 +142,7 @@ public class JWTService {
                 UserDTO userID = UserDTO.builder()
                         .userid(user)
                         .build();
-                UserDTO  userDTO = restService.getUser(userID);
+                UserDTO  userDTO = restService.getUser(userID.getUserid());
                 //몇가지 데이터가 잘 들어왔는지만 확인.
 
 
@@ -180,7 +172,7 @@ public class JWTService {
     public String makeRefreshToken(UserDTO userDTO) throws Exception {
 
         Date now = new Date();
-        String refreshtoken = Jwts.builder()
+        return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
                 .setIssuer("insang")                            // 토큰발급자 설정
                 .setIssuedAt(now)                               //토큰 발급 시간(현재)
@@ -190,7 +182,6 @@ public class JWTService {
                 .claim("type", "REFRESH")
                 .signWith(SignatureAlgorithm.HS256, refreshKey.getBytes())   // 해싱 알고리즘 + 키
                 .compact();
-        return refreshtoken;
     }
     private boolean validationAuthorizationHeader(String header) {
         if (header == null || !header.startsWith("Bearer "))

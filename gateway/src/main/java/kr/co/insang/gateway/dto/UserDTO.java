@@ -25,11 +25,6 @@ public class UserDTO {
         Map<String, String> map = new HashMap<>();
         map.put("userid", userid);
         map.put("password", password);
-        map.put("nickname", nickname);
-        map.put("email", email);
-        map.put("signupday", signupday);
-        map.put("grade", grade);
-
         return map;
     }
 

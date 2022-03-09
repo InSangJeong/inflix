@@ -33,23 +33,24 @@ public class JWTcontroller {
         UserDTO userinfo = restService.getLogin(userDto);
 
         if(userinfo != null){
+
             String refreshToken = jwtService.makeRefreshToken(userinfo);
             String accessToken = jwtService.makeAccessToken(refreshToken);
 
             if(accessToken.equals("invalid")){
+                System.out.println("wrong  aToken");
                 return Mono.empty();
             }
             else{
 
                 ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",refreshToken)
-                                .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.REFRESH.getTime()).sameSite("None").build();
+                                .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
-                        .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).sameSite("None").build();
+                        .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
                                 //.secure(true)
 
                 exchange.getResponse().addCookie(refreshCookie);
                 exchange.getResponse().addCookie(accessCookie);
-
                 return Mono.just(userinfo);
             }
         }
@@ -102,7 +103,7 @@ public class JWTcontroller {
                 String accessToken = jwtService.makeAccessToken(refreshCookie.getValue());
                 if (!accessToken.equals("invalid")) {//엑세스 토큰이 만들어졌으면 쿠키로 만들어서 httponly로 설정.
                     ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
-                            .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).sameSite("None").build();
+                            .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
                     exchange.getResponse().addCookie(accessCookie);
                     return Mono.just("Success");
                 }
@@ -116,9 +117,9 @@ public class JWTcontroller {
     public Mono<Boolean> deleteTokens(ServerWebExchange exchange){
         try{
             ResponseCookie rCookie = ResponseCookie.from("refreshToken","deleted")
-                    .httpOnly(true).path("/").domain(this.domain).maxAge(0).sameSite("None").build();
+                    .httpOnly(true).path("/").domain(this.domain).maxAge(0).build();
             ResponseCookie aCookie = ResponseCookie.from("accessToken","deleted")
-                    .httpOnly(true).path("/").domain(this.domain).maxAge(0).sameSite("None").build();
+                    .httpOnly(true).path("/").domain(this.domain).maxAge(0).build();
 
             exchange.getResponse().addCookie(rCookie);
             exchange.getResponse().addCookie(aCookie);
