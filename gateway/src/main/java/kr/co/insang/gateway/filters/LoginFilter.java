@@ -23,11 +23,7 @@ public class LoginFilter extends AbstractGatewayFilterFactory<LoginFilter.Config
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
-            logger.info("LoginFilter baseMessage>>>>>>" + config.getBaseMessage());
-            ServerHttpRequest httpRequest = exchange.getRequest();
-
             if (config.isPreLogger()) {
-                ;
             }
             return chain.filter(exchange).then(Mono.fromRunnable(()->{
                 if (config.isPostLogger()) {

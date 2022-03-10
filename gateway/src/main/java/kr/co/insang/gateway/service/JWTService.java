@@ -23,6 +23,7 @@ public class JWTService {
     private String refreshKey;
 
     private RESTService restService;
+    private Date now;
     //refresh token은 내용 볼 수 없도록 대칭키로 암호화해서 관리.
     //private AES256 aes256; (추후 구현)
     //@Autowired
@@ -31,39 +32,24 @@ public class JWTService {
     @Autowired
     public JWTService(RESTService restService){
         this.restService = restService;
+        this.now = new Date();
     }
 
 
     //토큰 검증만 수행
     public boolean verifyToken(String token, JwtType type) throws Exception {
-        String key=null;//access or refresh token key.
-        //String pureToken=null;
-
-
-        // 넘어올때 앞에 Bearer이 붙어서오기 때문에 이부분 확인 후 제거.
-        //if(validationAuthorizationHeader(token)){
-        //    pureToken = extractToken(token);
         if(type==JwtType.ACCESS)
         {
-            key = accessKey;
+            return checkClaim(token, accessKey.getBytes());
             //pureToken = token;
         }
         else if(type==JwtType.REFRESH)
         {
-            key = refreshKey;
+            return checkClaim(token, refreshKey.getBytes());
         }
-        return checkClaim(token, key.getBytes());
-
-            // 만료시간, 시그니처 확인.
-            //return checkClaim(pureToken, key.getBytes());
-            //추가로 확인하고싶으면 아래처럼 파싱해서 확인.
-            //Claims claims = Jwts.parser()
-            //        .setSigningKey(key)
-            //        .parseClaimsJws(pureToken)
-            //        .getBody();
-
-        //}
-
+        else{
+            return false;
+        }
     }
 
     //토큰 검증후 맞다면 페이로드를 리턴.
@@ -136,23 +122,19 @@ public class JWTService {
         {
             // 1. Refresh 토큰에서 사용자 정보 생성
             Claims claims = getPayload(refreshToken, JwtType.REFRESH);
-            String user = claims.getAudience();
-            if(user!=null){
+
+            if(claims.getAudience()!=null){
                 //2. 인증서버로부터 Access토큰에 넣을 값을 받아온다.
-                UserDTO userID = UserDTO.builder()
-                        .userid(user)
-                        .build();
-                UserDTO  userDTO = restService.getUser(userID.getUserid());
+                UserDTO  userDTO = restService.getUser(claims.getAudience());
+
                 //몇가지 데이터가 잘 들어왔는지만 확인.
-
-
                 if(!userDTO.getUserid().isEmpty()
                         && !userDTO.getGrade().isEmpty()
                         && !userDTO.getNickname().isEmpty())
 
                 {
                     //3. Access토큰 생성 및 반환
-                    Date now = new Date();
+
                     return Jwts.builder()
                             .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
                             .setIssuer("insang")                            // 토큰발급자 설정
@@ -171,13 +153,12 @@ public class JWTService {
     }
     public String makeRefreshToken(UserDTO userDTO) throws Exception {
 
-        Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
                 .setIssuer("insang")                            // 토큰발급자 설정
                 .setIssuedAt(now)                               //토큰 발급 시간(현재)
                 .setAudience(userDTO.getUserid())              //사용자 계정명
-                .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.REFRESH.getTime()).toMillis())) //토큰 만료시간
+                .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.ACCESS.getTime()).toMillis())) //토큰 만료시간
                 .claim("grade", userDTO.getGrade())         //관리자 및 유저등급 나눌때 사용할 클레임.
                 .claim("type", "REFRESH")
                 .signWith(SignatureAlgorithm.HS256, refreshKey.getBytes())   // 해싱 알고리즘 + 키

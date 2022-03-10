@@ -32,7 +32,7 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
     public GatewayFilter apply(Config config) {
 
         return ((exchange, chain) -> {
-            logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
+            //logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
             }
             //application.yml에서 predicates를 이용해서 하려했는데 더 복잡할듯해서 여기에다가함.

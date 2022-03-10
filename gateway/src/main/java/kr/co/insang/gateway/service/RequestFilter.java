@@ -26,8 +26,6 @@ public class RequestFilter {
         //8. All        /cms/**                         //테스트중으로 일단 모든 CMS접근을 허용한다.
         //9. All        /comment
 
-        boolean result = true;
-
         //8번 임시코드
         if(request.getPath().toString().startsWith("/cms/") || request.getPath().toString().startsWith("/comment")) {
             return false;
@@ -36,27 +34,27 @@ public class RequestFilter {
         if(request.getMethod().matches("GET") ){
             if(request.getPath().toString().equals("/authen/user")){
                 if (!request.getQueryParams().isEmpty())
-                    result = false;//1번.
+                    return false;//1번.
             }
             else if(request.getPath().toString().startsWith("/authen/user/")){
-                result = false; //4번, !!! 이건 인가서비스에서만 호출할 수 있어야함. 추후 체크하는 코드 추가.
+                return false; //4번, !!! 이건 인가서비스에서만 호출할 수 있어야함. 추후 체크하는 코드 추가.
             }
             else if(request.getPath().toString().equals("/autho/tokens")){
-                result = false;//6번
+                return false;//6번
             }
         }else if(request.getMethod().matches("POST")){
             if(request.getPath().toString().equals("/authen/user") ||request.getPath().toString().equals("/authen/login")){
-                result = false;//2, 3번.
+                return false;//2, 3번.
             }
             else if(request.getPath().toString().equals("/autho/tokens")){
-                result = false;//5번
+                return false;//5번
             }
         }else if(request.getMethod().matches("DELETE")){
             if(request.getPath().toString().equals("/autho/tokens")){
-                result = false;//7번
+                return false;//7번
             }
         }
 
-        return result;//그 외 모든 요청은 토큰 필요.
+        return true;//그 외 모든 요청은 토큰 필요.
     }
 }

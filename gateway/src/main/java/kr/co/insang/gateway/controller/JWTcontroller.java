@@ -31,6 +31,12 @@ public class JWTcontroller {
     @PostMapping("/tokens")
     public Mono<UserDTO> getTokens(@RequestBody UserDTO userDto, ServerWebExchange exchange) throws Exception {
         UserDTO userinfo = restService.getLogin(userDto);
+        //UserDTO userinfo = null;
+
+        Runtime.getRuntime().gc();
+        long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        System.out.print(usedMemory + " bytes");
+
 
         if(userinfo != null){
 
@@ -38,7 +44,6 @@ public class JWTcontroller {
             String accessToken = jwtService.makeAccessToken(refreshToken);
 
             if(accessToken.equals("invalid")){
-                System.out.println("wrong  aToken");
                 return Mono.empty();
             }
             else{
@@ -47,10 +52,11 @@ public class JWTcontroller {
                                 .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.REFRESH.getTime()).build();
                 ResponseCookie accessCookie = ResponseCookie.from("accessToken",accessToken)
                         .httpOnly(true).path("/").domain(this.domain).maxAge(JwtType.ACCESS.getTime()).build();
-                                //.secure(true)
 
                 exchange.getResponse().addCookie(refreshCookie);
                 exchange.getResponse().addCookie(accessCookie);
+
+
                 return Mono.just(userinfo);
             }
         }

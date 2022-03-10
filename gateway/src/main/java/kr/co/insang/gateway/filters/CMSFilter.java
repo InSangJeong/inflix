@@ -18,7 +18,6 @@ public class CMSFilter extends AbstractGatewayFilterFactory<CMSFilter.Config> {
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
-            logger.info("CMSFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
 
             }
