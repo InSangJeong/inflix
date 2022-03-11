@@ -64,9 +64,9 @@ public class HistoryService {
             return "Video of History is null!  " + e.toString()  ;
         }
     }
-    public boolean deleteHistorybyid(String historyid){
+    public boolean deleteHistorybyid(Long historyid){
         try{
-            watchHistoryRepository.deleteById(Long.parseLong(historyid));
+            watchHistoryRepository.deleteById(historyid);
             return true;
         }catch (Exception e){
             //logger e..

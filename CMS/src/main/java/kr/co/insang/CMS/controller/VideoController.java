@@ -2,10 +2,9 @@ package kr.co.insang.CMS.controller;
 
 import kr.co.insang.CMS.dto.VideoDTO;
 import kr.co.insang.CMS.dto.WatchHistoryDTO;
-import kr.co.insang.CMS.entity.Video;
-import kr.co.insang.CMS.entity.WatchHistory;
 import kr.co.insang.CMS.service.HistoryService;
 import kr.co.insang.CMS.service.VideoService;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -17,6 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +28,7 @@ import java.util.List;
 @PropertySource("classpath:application-resource.properties")
 @RestController
 @RequestMapping("/cms")
-public class VideoController {
+public class VideoController{
     @Value("${resourcePath}")
     String resourcePath;
     final static int maxVideoCount=10;
@@ -36,8 +39,9 @@ public class VideoController {
     HistoryService historyService;
 
     @GetMapping("/moviepath/{videoid}")
-    public ResponseEntity<Resource> getVideoPath(@PathVariable("videoid") String videoid){
+    public ResponseEntity<Resource> getVideoPath(@NotEmpty @Min(1) @Max(255) @PathVariable("videoid") String videoid){
         try {
+            //TODO : 밑에 String으로 자꾸 변환하는데 builder나 buffer로 변환하고 테스트!
             String fileName = videoService.getVideoPathbyid(videoid);
             String path = resourcePath + fileName;
             Resource resource = new FileSystemResource(path);
@@ -52,7 +56,7 @@ public class VideoController {
     }
 
     @GetMapping("/videoname/{videoid}")
-    public ResponseEntity<String> getVideoName(@PathVariable("videoid") String videoid){
+    public ResponseEntity<String> getVideoName(@NotEmpty @Min(1) @Max(255) @PathVariable("videoid") String videoid){
         VideoDTO video = videoService.getVideoInfoById(videoid);
         if(video!=null){
             return new ResponseEntity<String>(video.getTitle(), HttpStatus.OK);
@@ -64,7 +68,7 @@ public class VideoController {
 
 
     @GetMapping("/videoinfo/{videoid}")
-    public ResponseEntity<VideoDTO> getVideoInfo(@PathVariable("videoid") String videoid){
+    public ResponseEntity<VideoDTO> getVideoInfo(@NotEmpty  @Min(1) @Max(255) @PathVariable("videoid") String videoid){
         VideoDTO video = videoService.getVideoInfoById(videoid);
         if(video!=null){
             return new ResponseEntity<VideoDTO>(video, HttpStatus.OK);
@@ -80,7 +84,7 @@ public class VideoController {
     }
 
     @GetMapping("/randomvideos/{cntvideo}")
-    public ResponseEntity<List<VideoDTO>> getRandomVideos(@PathVariable("cntvideo")int cntVideo){
+    public ResponseEntity<List<VideoDTO>> getRandomVideos(@NotEmpty @Range(min= 1, max=10)@PathVariable("cntvideo")int cntVideo){
       if(0 < cntVideo && cntVideo < this.maxVideoCount ){
         List<VideoDTO> videos = videoService.getRandomVideos(cntVideo);
         if(videos != null)
@@ -95,17 +99,15 @@ public class VideoController {
 
 
     @GetMapping("/imagepath/{videoid}")
-    public ResponseEntity<Resource> getImageByid(@PathVariable("videoid") String videoid) {
+    public ResponseEntity<Resource> getImageByid(@NotEmpty @Min(1) @Max(255) @PathVariable("videoid") String videoid) {
         try {
             String path = videoService.getImagePathByid(videoid);
             FileSystemResource resource = new FileSystemResource(resourcePath + path);
             if (!resource.exists()) {
                 return new ResponseEntity<Resource>(HttpStatus.NO_CONTENT);
-                //throw new NotFoundImageException();
             }
             HttpHeaders header = new HttpHeaders();
-            Path filePath = null;
-            filePath = Paths.get(path);
+            Path filePath = Paths.get(path);
             header.add("Content-Type", Files.probeContentType(filePath));
             return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
         } catch (Exception e) {
@@ -114,7 +116,7 @@ public class VideoController {
     }
 
     @GetMapping("/history/{userid}")
-    public ResponseEntity<List<WatchHistoryDTO>> getWatchHistory(@PathVariable("userid") String userid){
+    public ResponseEntity<List<WatchHistoryDTO>> getWatchHistory(@NotEmpty @Min(1) @Max(255) @PathVariable("userid") String userid){
         List<WatchHistoryDTO> result = historyService.getHistorybyUserid(userid);
         if(result != null){
             return new ResponseEntity<List<WatchHistoryDTO>>(result, HttpStatus.OK);
@@ -122,7 +124,7 @@ public class VideoController {
         return new ResponseEntity<List<WatchHistoryDTO>>(HttpStatus.NO_CONTENT);
     }
     @PostMapping("/history")
-    public ResponseEntity<String> addHistory(@RequestBody WatchHistoryDTO historyDTO) {
+    public ResponseEntity<String> addHistory(@Valid @RequestBody WatchHistoryDTO historyDTO) {
         String result = historyService.createHistory(historyDTO);
 
         if(result.startsWith("historyid:")){
@@ -135,7 +137,7 @@ public class VideoController {
     }
 
     @DeleteMapping("/history/{historyid}")
-    public ResponseEntity<String> deleteHistory(@PathVariable("historyid") String historyid){
+    public ResponseEntity<String> deleteHistory(@NotEmpty @PathVariable("historyid") Long historyid){
         if(historyService.deleteHistorybyid(historyid)){
             return new ResponseEntity<String>("Success", HttpStatus.OK);
         }
@@ -145,7 +147,7 @@ public class VideoController {
     }
 
     @DeleteMapping("/allhistory/{userid}")
-    public ResponseEntity<String> deleteHistorybyUserid(@PathVariable("userid") String userid){
+    public ResponseEntity<String> deleteHistorybyUserid(@NotEmpty @Min(1) @Max(255) @PathVariable("userid") String userid){
         if(historyService.deleteHistorybyUserid(userid)){
             return new ResponseEntity<String>("Success", HttpStatus.OK);
         }

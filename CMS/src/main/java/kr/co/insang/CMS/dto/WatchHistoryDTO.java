@@ -4,6 +4,8 @@ import kr.co.insang.CMS.entity.Video;
 import kr.co.insang.CMS.entity.WatchHistory;
 import lombok.*;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Null;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,10 +14,14 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Setter
 public class WatchHistoryDTO {
-
+    //Validation Annotation은 post 기준에서만 사용됩니다.
+    @Null
     private Long historyid;
+    @NotEmpty
     private String userid;
+    @NotEmpty
     private Video video;
+    @Null
     private String watchtime;
 
     public WatchHistory toEntity(){
