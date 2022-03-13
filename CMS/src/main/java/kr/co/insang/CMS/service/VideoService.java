@@ -16,8 +16,11 @@ import static kr.co.insang.CMS.entity.Video.toVideoDtoList;
 @Transactional
 public class VideoService {
 
-    @Autowired
-    VideoRepository videoRepository;
+    private VideoRepository videoRepository;
+
+    public VideoService(VideoRepository videoRepository){
+        this.videoRepository = videoRepository;
+    }
 
 
     public String getVideoPathbyid(String videoid){

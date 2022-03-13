@@ -22,11 +22,15 @@ import static kr.co.insang.CMS.entity.WatchHistory.toWatchHistoyDtoList;
 @Service
 @Transactional
 public class HistoryService {
-    @Autowired
-    WatchHistoryRepository watchHistoryRepository;
+    private WatchHistoryRepository watchHistoryRepository;
+    private VideoRepository videoRepository;
 
-    @Autowired
-    VideoRepository videoRepository;
+    public HistoryService(WatchHistoryRepository watchHistoryRepository,VideoRepository videoRepository){
+        this.watchHistoryRepository = watchHistoryRepository;
+        this.videoRepository = videoRepository;
+    }
+
+
 
     public List<WatchHistoryDTO> getHistorybyUserid(String userid){
         try{
