@@ -9,5 +9,3 @@
  위 구성도 중 Backend부분이며 각 서비스는 Docker의 Container 환경에서 운영됩니다.
 
  각 서비스의 EndPoint 제공을 위하여 Spring Cloud Gateway 적용하였습니다.
-
- 내용 추가중.
