@@ -1,12 +1,12 @@
 package kr.co.insang.gateway.service;
 
 import kr.co.insang.gateway.constant.JwtType;
+import kr.co.insang.gateway.dto.UserDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class JwtServiceTest {
@@ -29,4 +29,22 @@ public class JwtServiceTest {
         assertFalse(resultFail2, "Wrong Data");
 
     }
+
+    @Test
+    public void makeRefreshToken() throws Exception {
+        UserDTO userDTO = UserDTO.builder()
+                .userid("temp")
+                .grade("USER")
+                .build();
+
+        String resultOk = testService.makeRefreshToken(userDTO);
+        String resultFail = testService.makeRefreshToken(null);
+
+        assertNotNull(resultOk, "should be Not Null");
+        assertNull(resultFail, "should be Null");
+
+
+    }
+
+
 }

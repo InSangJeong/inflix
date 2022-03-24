@@ -152,17 +152,20 @@ public class JWTService {
         return "invalid";
     }
     public String makeRefreshToken(UserDTO userDTO) throws Exception {
-
-        return Jwts.builder()
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
-                .setIssuer("insang")                            // 토큰발급자 설정
-                .setIssuedAt(now)                               //토큰 발급 시간(현재)
-                .setAudience(userDTO.getUserid())              //사용자 계정명
-                .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.ACCESS.getTime()).toMillis())) //토큰 만료시간
-                .claim("grade", userDTO.getGrade())         //관리자 및 유저등급 나눌때 사용할 클레임.
-                .claim("type", "REFRESH")
-                .signWith(SignatureAlgorithm.HS256, refreshKey.getBytes())   // 해싱 알고리즘 + 키
-                .compact();
+        try {
+            return Jwts.builder()
+                    .setHeaderParam(Header.TYPE, Header.JWT_TYPE)   //헤더 타입. jwt
+                    .setIssuer("insang")                            // 토큰발급자 설정
+                    .setIssuedAt(now)                               //토큰 발급 시간(현재)
+                    .setAudience(userDTO.getUserid())              //사용자 계정명
+                    .setExpiration(new Date(now.getTime() + Duration.ofMinutes(JwtType.ACCESS.getTime()).toMillis())) //토큰 만료시간
+                    .claim("grade", userDTO.getGrade())         //관리자 및 유저등급 나눌때 사용할 클레임.
+                    .claim("type", "REFRESH")
+                    .signWith(SignatureAlgorithm.HS256, refreshKey.getBytes())   // 해싱 알고리즘 + 키
+                    .compact();
+        }catch (Exception e){
+            return null;
+        }
     }
     private boolean validationAuthorizationHeader(String header) {
         if (header == null || !header.startsWith("Bearer "))
