@@ -6,6 +6,8 @@ import kr.co.insang.CMS.service.HistoryService;
 import kr.co.insang.CMS.service.VideoService;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -35,7 +37,9 @@ import java.util.List;
 public class VideoController{
     @Value("${resourcePath}")
     private String resourcePath;
-    final static int maxVideoCount=10;
+    private final static int maxVideoCount=10;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     private VideoService videoService;
     private HistoryService historyService;
@@ -48,6 +52,7 @@ public class VideoController{
 
     @GetMapping("/moviepath/{videoid}")
     public ResponseEntity<Resource> getVideoPath(@PathVariable("videoid") @NotEmpty @Length(min=1, max=255) String videoid){
+        logger.info("get Video Path");
         try {
             String fileName = videoService.getVideoPathbyid(videoid);
             StringBuilder path = new StringBuilder(resourcePath);
