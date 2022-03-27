@@ -1,6 +1,8 @@
 package kr.co.insang.gateway.service;
 
 
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +10,26 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RequestFilter {
+
+    public boolean checkCSRF(ServerHttpRequest request){
+        HttpCookie hostCookie = request.getCookies().getFirst("Referer");
+        HttpCookie referCookie = request.getCookies().getFirst("Host");
+        if(hostCookie == null || referCookie == null){
+            return false; // Referer를 확인할 수 없음.
+        }else if (!referCookie.getValue().contains(hostCookie.getValue())) {
+            return false; // 호스트와 일치 하지 않음.
+        }
+
+            /*
+            //client와 어떤 방식으로 csrf 토큰 생성할지 고민한 후에 추가 예정.
+            HttpCookie csrfCookie = exchange.getRequest().getCookies().getFirst("csrf-token");
+            if(!csrfCookie.getValue().equals("test")){
+                return handleUnAuthorized(exchange,HttpStatus.UNAUTHORIZED); // 401 Error
+            }
+             */
+
+        return true;
+    }
 
     // 요청중 토큰 검증이 필요한 요청인지 아닌지 검증 후 리턴.
     // 방화벽에서 쓰이는거처럼 기본적으로 모든 요청이 토큰이 필요하다고 판단하고

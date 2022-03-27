@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -35,6 +34,12 @@ public class GlobalFilter extends AbstractGatewayFilterFactory<GlobalFilter.Conf
             //logger.info("GlobalFilter baseMessage>>>>>>" + config.getBaseMessage());
             if (config.isPreLogger()) {
             }
+            //Spring Security를 사용 안하니까 직접 csrf token 값을 확인해서 csrf 방어한다.
+            if(!requestFilter.checkCSRF(exchange.getRequest())){
+                return handleUnAuthorized(exchange,HttpStatus.UNAUTHORIZED); // CSRF Error
+            }
+
+
             //application.yml에서 predicates를 이용해서 하려했는데 더 복잡할듯해서 여기에다가함.
             //토큰이 필요한 요청인 경우 httponly(cookie) 토큰이 검증된 경우에만 pass한다.
             if(requestFilter.filterRequest(exchange.getRequest())){                 //토큰 검증 필요
