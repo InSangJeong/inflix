@@ -12,8 +12,11 @@ import java.util.Optional;
 
 @Service
 public class CommentService {
-    @Autowired
     CommentRepository commentRepository;
+
+    public CommentService(CommentRepository commentRepository){
+        this.commentRepository = commentRepository;
+    }
 
     public List<CommentDTO> getCommentByUserid(String userid) {
         List<Comment> comments = commentRepository.findAllByuserId(userid);

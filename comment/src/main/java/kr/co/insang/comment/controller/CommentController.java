@@ -13,9 +13,11 @@ import java.util.List;
 @Controller
 @RequestMapping("/comment")
 public class CommentController {
-
-    @Autowired
     CommentService commentService;
+
+    public CommentController(CommentService commentService){
+        this.commentService = commentService;
+    }
 
     @GetMapping("/{userid}")
     public ResponseEntity<List<CommentDTO>> getCommentsByUserID(@PathVariable("userid") String userid){
