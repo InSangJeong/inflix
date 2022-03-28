@@ -19,7 +19,6 @@ public class RESTService {
     private RestTemplate restTemplate;
     private HttpHeaders headers;
 
-    @Autowired
     public RESTService(){
         // 내가 나 자신에게 보는 형태인데 메시지가 어디에선가 쌓여서 메모리 누수 나는듯. SCG에서 그런부분 있는지 확인하고 변경해야함.
         //this.pathLogin="http://10.0.1.168:8000/authen/login";
@@ -55,7 +54,6 @@ public class RESTService {
         ResponseEntity<UserDTO> response = restTemplate.getForEntity(this.pathUser,  UserDTO.class, id);
 
         if(response.hasBody()){
-
             return response.getBody();
         }
         else{

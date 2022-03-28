@@ -19,7 +19,6 @@ public class JWTcontroller {
     private JWTService jwtService;
     private String domain;
 
-    @Autowired
     public JWTcontroller(RESTService restService, JWTService jwtService){
         this.restService = restService;
         this.jwtService = jwtService;

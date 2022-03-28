@@ -2,7 +2,6 @@ package kr.co.insang.gateway.service;
 
 
 import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 

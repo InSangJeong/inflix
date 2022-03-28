@@ -29,7 +29,6 @@ public class JWTService {
     //@Autowired
     //public JWTService(AES256 aes256){this.aes256=aes256;}
 
-    @Autowired
     public JWTService(RESTService restService){
         this.restService = restService;
         this.now = new Date();
